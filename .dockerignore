@@ -1,0 +1,12 @@
+.devcontainer
+.github
+.git
+.pytest_cache
+.vscode
+archive
+docs
+jenkins
+.env*
+newsbot.log
+pytest.ini
+tests

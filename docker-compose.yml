@@ -1,0 +1,25 @@
+version: "3"
+
+networks:
+  newsbot:
+    external: false
+
+services:
+  worker:
+    image: newsbot-worker:latest
+    env_file:
+      - ./.env
+    shm_size: 3gb
+    networks:
+      - newsbot
+
+  api:
+    image: ghcr.io/jtom38/newsbotapi:master
+    env:
+      - NEWSBOT_DATABASE_NAME = 'newsbot.api'
+      - NEWSBOT_DATABASE_TYPE = 'sqlite'
+      - NEWSBOT_DATABASE_PATH = '/'
+    ports:
+      - 8000:8000
+    networks:
+      - newsbot
