@@ -3,12 +3,11 @@ from newsbot.core.sql.schema import DiscordQueue
 from newsbot.core.sql.common import RestSql
 from typing import List
 from json import loads
-from os import getenv
 
 class DiscordQueueTable(RestSql):
     def __init__(self):
         # pull from env
-        self.baseUrl: str = getenv("NEWSBOT_API_URI")
+        self.baseUrl = self.__getApiUri__()
         self.uri: str = f"{self.baseUrl}/v1/discordqueue"
 
     def __toApi__(self, item: DiscordQueue) -> dict:

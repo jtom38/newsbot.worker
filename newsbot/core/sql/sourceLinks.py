@@ -2,13 +2,12 @@ from requests import get, post, delete
 from newsbot.core.sql.schema import SourceLinks
 from typing import List
 from json import loads
-from os import getenv
 
 
 class SourceLinksTable():
     def __init__(self):
         # pull from env
-        self.baseUrl: str = getenv("NEWSBOT_API_URI")
+        self.baseUrl = self.__getApiUri__()
         self.uri: str = f"{self.baseUrl}/v1/sourcelinks"
 
     def __toApi__(self, item: SourceLinks) -> dict:
