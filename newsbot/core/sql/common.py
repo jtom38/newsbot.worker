@@ -1,6 +1,8 @@
 from typing import List
 from abc import ABC, abstractclassmethod
 from json import loads
+from .exceptions import MissingApiUrl
+from os import getenv
 
 class IRestSql(ABC):
 
@@ -25,6 +27,16 @@ class IRestSql(ABC):
         raise NotImplementedError()
 
 class RestSql(IRestSql):
+    def __getApiUri__(self) -> str:
+        try:
+            res = getenv("NEWSBOT_API_URI")
+            if res is None:
+                raise MissingApiUrl
+            return res
+        except MissingApiUrl as e:
+            print("Was unable to find a value against 'NEWSBOT_API_URI'.  Please make sure it has been added and try again.")
+            exit(1)
+
     def __singleFromApi__(self, raw: str) -> object:
         d = loads(raw)
         return self.__fromApi__(d)

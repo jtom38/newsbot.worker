@@ -2,13 +2,12 @@ from requests import get, post, delete
 from newsbot.core.sql.schema import Articles
 from newsbot.core.sql.common import RestSql
 from typing import List
-from os import getenv
+
 
 class ArticlesTable(RestSql):
     def __init__(self):
         # pull from env
-        #self.baseUrl: str = 'http://newsbotapi_devcontainer_app_1:8000'
-        self.baseUrl: str = getenv("NEWSBOT_API_URI")
+        self.baseUrl = self.__getApiUri__()
         self.uri: str = f"{self.baseUrl}/v1/articles"
 
     def __toApi__(self, item: Articles) -> dict:
