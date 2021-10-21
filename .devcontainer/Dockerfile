@@ -21,16 +21,21 @@ COPY . /app
 WORKDIR /app
 RUN pip3 install -r requirements.txt
 
+# Add the path for poetry
+#ENV PATH="/root/.local/bin/poetry:${PATH}"
+
+#RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -o /tmp/install-poetry.py && \
+#	python /tmp/install-poetry.py -y && \
+#	poetry install --no-root
+
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz && \
 	tar xf geckodriver-v0.29.1-linux64.tar.gz && \
 	chmod +x geckodriver && \
 	mv geckodriver /usr/local/bin && \
 	rm geckodriver-v0.29.1-linux64.tar.gz
 
-run wget https://github.com/crate-ci/typos/releases/download/v1.0.3/typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz && \
+RUN wget https://github.com/crate-ci/typos/releases/download/v1.0.3/typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz && \
 	tar xf typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz && \
 	chmod +x typos && \
 	mv typos /usr/local/bin && \
 	rm typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz
-
-CMD [ "python", "app.py" ]

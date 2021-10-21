@@ -19,6 +19,7 @@ RUN echo deb http://deb.debian.org/debian/ unstable main contrib non-free >> /et
 
 COPY . /app
 WORKDIR /app
+
 RUN pip3 install -r requirements.txt
 
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz && \
@@ -27,6 +28,9 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckod
 	mv geckodriver /usr/local/bin && \
 	rm geckodriver-v0.29.1-linux64.tar.gz
 
+#RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -o /tmp/install-poetry.py && \
+#	python /tmp/install-poetry.py -y && \
+#	export PATH="$HOME/.local/bin:$PATH" && \
+#	poetry install --no-dev
 
-
-CMD [ "python", "app.py" ]
+CMD ["uvicorn", "newsbotWorker.api.appapp", "--host", "0.0.0.0", "--port", "8001"]
