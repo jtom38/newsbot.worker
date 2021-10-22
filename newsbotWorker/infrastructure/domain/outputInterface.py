@@ -3,7 +3,7 @@ from abc import ABC, abstractclassmethod
 
 class OutputInterface(ABC):
     @abstractclassmethod
-    def enableThread(self) -> None:
+    def init(self) -> None:
         raise NotImplementedError
 
     @abstractclassmethod
@@ -18,6 +18,3 @@ class OutputInterface(ABC):
     def isSafeToRemove(self) -> bool:
         raise NotImplementedError
 
-    @abstractclassmethod
-    def threadWait(self) -> None:
-        raise NotImplementedError

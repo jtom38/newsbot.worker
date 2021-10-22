@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from newsbotWorker.service import ApiEventsService
+from newsbotWorker.service.api import ApiEventsService
 from newsbotWorker.api.routes import SchedulerRouter
 
 

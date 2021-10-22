@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 from newsbotWorker.infrastructure.models import HealthModel
-from newsbotWorker.service import HealthService
+from newsbotWorker.service.api import HealthService
 
 router = APIRouter(
-
     prefix='/health'
     ,tags=['health']
     
