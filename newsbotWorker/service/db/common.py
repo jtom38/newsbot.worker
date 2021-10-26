@@ -1,8 +1,8 @@
 from typing import List
 from json import loads
-from newsbotWorker.infrastructure.exceptions import MissingApiUrl
+from newsbotWorker.infra.exceptions import MissingApiUrl
 from os import getenv
-from newsbotWorker.infrastructure.domain import DbApiTableInterface
+from newsbotWorker.infra.domain import DbApiTableInterface
 
 class RestSql(DbApiTableInterface):
     def __getApiUri__(self) -> str:

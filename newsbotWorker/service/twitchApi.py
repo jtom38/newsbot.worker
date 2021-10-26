@@ -1,4 +1,4 @@
-from newsbotWorker.infrastructure.models.twitchApi import TwitchAuth, TwitchChannel, TwitchClip, TwitchGameData, TwitchStream, TwitchUser, TwitchVideo
+from newsbotWorker.infra.models import TwitchAuth, TwitchChannel, TwitchClip, TwitchGameData, TwitchStream, TwitchUser, TwitchVideo
 from newsbotWorker.service.logger import Logger
 from requests import get, post
 from json import loads

@@ -1,11 +1,25 @@
-from newsbotWorker.infrastructure.models.envReader import *
-from newsbotWorker.service.envreader import Env
-from newsbotWorker.infrastructure.enum import SourcesEnum, SourceTypeEnum
-#from newsbot.core.constant import SourcesSource, SourceType, SourcesSource
+from newsbotWorker.infra.models import (
+    EnvRssDetails
+    ,EnvYoutubeConfig
+    ,EnvYoutubeDetails
+    ,EnvRedditDetails
+    ,EnvTwitchDetails
+    ,EnvTwitterDetails
+    ,EnvInstagramDetails
+    ,EnvPokemonGoDetails
+    ,EnvPhantasyStarOnline2Details
+    ,EnvFinalFantasyXIVDetails
+    ,EnvRedditConfig
+    ,EnvTwitchConfig
+    ,EnvTwitterConfig
+    ,EnvDiscordDetails
+)
+from newsbotWorker.infra.enum import SourcesEnum, SourceTypeEnum
+from newsbotWorker.infra.models import Icons, Settings, Sources, DiscordWebHooks
+from newsbotWorker.service.db import *
+from newsbotWorker.service.envReaderService import EnvReaderService
 from typing import List
 from abc import ABC, abstractclassmethod
-from newsbotWorker.service.db import *
-from newsbotWorker.infrastructure.models.db import *
 
 
 class FailedToIUpdateSource(Exception):
@@ -225,7 +239,7 @@ class UpdateFinalFantasyXIVSource(UpdateSource):
 
 class InitDb:
     def __init__(self) -> None:
-        self.e = Env()
+        self.e = EnvReaderService()
         self.enableTables()
 
     def enableTables(self) -> None:

@@ -1,15 +1,15 @@
 from typing import List
 import re
 from time import sleep
-from newsbotWorker.infrastructure.enum import SourcesEnum
-from newsbotWorker.service.envreader import Env
+from newsbotWorker.infra.enum import SourcesEnum
+from newsbotWorker.service import Logger
 from newsbotWorker.service.logger import Logger
-from newsbotWorker.infrastructure.models.db import Articles, Sources, SourceLinks, DiscordQueue, DiscordWebHooks
-from newsbotWorker.infrastructure.domain import OutputInterface, OutputFormatterInterface
-from newsbotWorker.infrastructure.base import OutputBase
-from newsbotWorker.infrastructure.exceptions import DiscordWebHookNotFound
+from newsbotWorker.infra.models import Articles, Sources, SourceLinks, DiscordQueue, DiscordWebHooks
+from newsbotWorker.infra.domain import OutputInterface, OutputFormatterInterface
+from newsbotWorker.infra.base import OutputBase
+from newsbotWorker.infra.exceptions import DiscordWebHookNotFound
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from newsbotWorker.infrastructure.base import ConvertHtml
+from newsbotWorker.infra.base import ConvertHtml
 from requests import Response
 
 
@@ -65,7 +65,6 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         self.enableTables()
         self.logger = Logger(__class__)
         self.tempMessage: DiscordWebhook = DiscordWebhook("placeholder")
-        self.env = Env()
         self.article: Articles
         self.source: Sources
         pass

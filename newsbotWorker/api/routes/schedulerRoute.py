@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import List
 from newsbotWorker.service.scheduler import SchedulerService
-from newsbotWorker.infrastructure.models import SchedulerActveJobsModel
+from newsbotWorker.infra.models import SchedulerActveJobsModel
 
 router = APIRouter(
     prefix='/scheduler'

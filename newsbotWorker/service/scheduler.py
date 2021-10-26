@@ -1,11 +1,11 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from newsbotWorker.infrastructure.enum.schedulerEnum import SchedulerTriggerEnum
-from newsbotWorker.infrastructure.models import SchedulerJobModel
+from newsbotWorker.infra.enum.schedulerEnum import SchedulerTriggerEnum
+from newsbotWorker.infra.models import SchedulerJobModel
 from typing import List
 
-from newsbotWorker.infrastructure.models.schedulerModels import SchedulerActveJobsModel
+from newsbotWorker.infra.models.schedulerModels import SchedulerActveJobsModel
 
 __jobstore__ = {
     'default': MemoryJobStore()

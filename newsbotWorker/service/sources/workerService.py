@@ -1,11 +1,10 @@
 from newsbotWorker.service.db.discordQueue import DiscordQueueTable
-from newsbotWorker.service.envreader import Env
-from newsbotWorker.infrastructure.domain import LoggerInterface
-from newsbotWorker.infrastructure.models.db import Articles, DiscordQueue
-from newsbotWorker.infrastructure.domain import SourcesInterface
+from newsbotWorker.service import EnvReaderService
+from newsbotWorker.infra.domain import LoggerInterface
+from newsbotWorker.infra.models import Articles, DiscordQueue
+from newsbotWorker.infra.domain import SourcesInterface
 from newsbotWorker.service.logger import Logger
 from newsbotWorker.service.db import ArticlesTable
-from time import sleep
 
 
 class WorkerService():
@@ -16,7 +15,7 @@ class WorkerService():
     def __init__(self, source: SourcesInterface):
         self.logger: LoggerInterface = Logger(__class__)
         self.enabled: bool = False
-        self.env = Env()
+        self.env = EnvReaderService()
         self.source: SourcesInterface = source
 
     def __threadInit__(self) -> None:

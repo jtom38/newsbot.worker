@@ -1,6 +1,6 @@
-from newsbotWorker.infrastructure.enum.healthEnum import HealthStatusEnum
-from newsbotWorker.infrastructure.models import HealthModel
-from newsbotWorker.infrastructure.models.healthModel import HealthServiceModel
+from newsbotWorker.infra.enum.healthEnum import HealthStatusEnum
+from newsbotWorker.infra.models import HealthModel
+
 
 class HealthService():
     """

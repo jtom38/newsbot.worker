@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from newsbotWorker.infrastructure.models import HealthModel
+from newsbotWorker.infra.models import HealthModel
 from newsbotWorker.service.api import HealthService
 
 router = APIRouter(

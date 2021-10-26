@@ -1,10 +1,10 @@
 from newsbotWorker.service.logger import Logger
 from newsbotWorker.service.cache import Cache
-from newsbotWorker.infrastructure.enum import SourcesEnum
-from newsbotWorker.infrastructure.models.db import Articles
-from newsbotWorker.infrastructure.domain import SourcesInterface
-from newsbotWorker.service.driver import FirefoxDriverService
-from newsbotWorker.infrastructure.base import SourcesBase
+from newsbotWorker.infra.enum import SourcesEnum
+from newsbotWorker.infra.models import Articles, EnvRedditConfig
+from newsbotWorker.infra.domain import SourcesInterface
+from newsbotWorker.service import FirefoxDriverService
+from newsbotWorker.infra.base import SourcesBase
 from typing import List
 from time import sleep
 from bs4 import BeautifulSoup
@@ -17,9 +17,11 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         self.cache = Cache()
         self.uri = "https://reddit.com/r/aww/top.json"
         self.setSiteName(SourcesEnum.REDDIT)
-        self.settingNsfwAllowed: bool = bool(self.cache.findBool(key="reddit.allow.nsfw"))
-        self.settingPullTop: bool = bool(self.cache.findBool("reddit.pull.top"))
-        self.settingPullHot: bool = bool(self.cache.findBool("reddit.pull.hot"))
+        self.config = EnvRedditConfig(
+            allowNsfw= bool(self.cache.findBool(key="reddit.allow.nsfw")),
+            pullTop= bool(self.cache.findBool("reddit.pull.top")),
+            pullHot= bool(self.cache.findBool("reddit.pull.hot"))
+        )
 
     def getArticles(self) -> List[Articles]:
         allArticles: List[Articles] = list()
@@ -43,7 +45,7 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 #if exists.id == '':
                 
                 # Checking if NFSW posts can be sent
-                if p['data']['over_18'] == True and self.settingNsfwAllowed == False:
+                if p['data']['over_18'] == True and self.config.allowNsfw == False:
                     continue
 
                 post = self.getPostDetails(p["data"], authorName, authorImage )
@@ -123,10 +125,10 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             self.settingPullTop = True
 
         jsonUrl: str = ''
-        if self.settingPullHot == True:
+        if self.config.pullHot == True:
             jsonUrl = f"{rootUri}.json"
 
-        if self.settingPullTop == True:
+        if self.config.pullTop == True:
             jsonUrl = f"{rootUri}/top.json"
 
         self.logger.debug(f"Collecting posts from {jsonUrl}")

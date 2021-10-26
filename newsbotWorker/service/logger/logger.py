@@ -1,5 +1,5 @@
-from newsbotWorker.infrastructure.enum import LogLevels
-from newsbotWorker.infrastructure.domain import LoggerInterface
+from newsbotWorker.infra.enum import LogLevels
+from newsbotWorker.infra.domain import LoggerInterface
 from datetime import datetime
 from inspect import getframeinfo, stack
 from os.path import exists

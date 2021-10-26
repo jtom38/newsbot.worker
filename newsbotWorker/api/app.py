@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from newsbotWorker.service.api import ApiEventsService
-from newsbotWorker.api.routes import SchedulerRouter
+from newsbotWorker.api.routes import SchedulerRouter, RedditRouter
 
 
 app = FastAPI(
@@ -10,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(SchedulerRouter)
+app.include_router(RedditRouter)
 
 #@app.get('/health')
 #def healthCheck() -> HealthModel:
