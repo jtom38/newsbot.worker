@@ -7,7 +7,8 @@ from newsbotWorker.service.sources import (
     WorkerService, 
     RedditWorkerService,
     YoutubeWorkerService,
-    TwitterWorkerService
+    TwitterWorkerService,
+    TwitchWorkerService
 )
 
 
@@ -17,13 +18,14 @@ class ApiEventsService():
 
     def startup(self) -> None:
         print("Running start up tasks")
-        #InitDb().runDatabaseTasks()
+        InitDb().runDatabaseTasks()
         ss = SchedulerService()
-        ss.addJob(SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init,trigger=SchedulerTriggerEnum.INTERVAL,interval= True,minutes=1))
+        #ss.addJob(SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init,trigger=SchedulerTriggerEnum.INTERVAL,interval= True,minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(YoutubeWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(TwitterWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
+        #ss.addJob(SchedulerJobModel(functionName=WorkerService(TwitchWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
 
-        #ss.addJob(SchedulerJobModel(functionName=DiscordOutputService().init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
+        ss.addJob(SchedulerJobModel(functionName=DiscordOutputService().init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=5))
         ss.start()
 
     def shutdown(self) -> None:

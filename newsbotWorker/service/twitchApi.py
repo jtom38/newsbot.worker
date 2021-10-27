@@ -22,16 +22,19 @@ class TwitchAPI:
 
         res = post(uri)
         if res.status_code != 200:
-            Logger().error(res.text)
-            return TwitchAuth()
+            Logger(__class__).error(res.text)
+            raise Exception("Failed to auth with Twitch.  Make sure NEWSBOT_TWITCH_CLIENT_ID anf NEWSBOT_TWITCH_CLIENT_SECRET are defined.")
         else:
             token = loads(res.content)
-            o = TwitchAuth(
-                access_token=token["access_token"],
-                expires_in=token["expires_in"],
-                token_type=token["token_type"],
-                client_id=client_id,
-            )
+            try:
+                o = TwitchAuth(
+                    access_token=token["access_token"],
+                    expires_in=token["expires_in"],
+                    token_type=token["token_type"],
+                    client_id=client_id,
+                )
+            except Exception as e:
+                raise Exception("Failed to auth with Twitch.  Make sure NEWSBOT_TWITCH_CLIENT_ID anf NEWSBOT_TWITCH_CLIENT_SECRET are defined.")
             return o
 
     def getUser(self, auth: TwitchAuth, username: str) -> None:

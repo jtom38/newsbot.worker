@@ -1,4 +1,4 @@
-from newsbotWorker.service.db.discordQueue import DiscordQueueTable
+from newsbotWorker.service.db.tableDiscordQueue import DiscordQueueTable
 from newsbotWorker.service import EnvReaderService
 from newsbotWorker.infra.domain import LoggerInterface
 from newsbotWorker.infra.models import Articles, DiscordQueue

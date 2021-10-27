@@ -1,4 +1,4 @@
-from newsbotWorker.infra.models import TwitterSettings, Articles, Sources
+from newsbotWorker.infra.models import Articles, Sources, EnvTwitterConfig
 from newsbotWorker.service.db import ArticlesTable
 from newsbotWorker.service import Logger, Cache, FirefoxDriverService
 from newsbotWorker.infra.enum import SourcesEnum
@@ -25,22 +25,25 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
         self.exists: bool = False
         self.__tweet__ = tweet
         self.article = self.__newArticle__()
-        self.article.sourceId = sourceId
-        self.article.authorName = self.getAuthorName(tweet)
-        self.article.authorImage = self.getAuthorImage(tweet)
-        self.article.description = self.getDescription(tweet)
-        self.article.tags = self.getTags(searchValue)
-        self.article.url = self.getUrl()
-        self.article.pubDate = self.getPublishDate()
 
+        self.article.url = self.getUrl()
         if self.articleExists() is True:
             self.article = self.__newArticle__()
             self.exists = True
             return None
 
-        self.article.thumbnail = self.getThumbnail()
-        if self.article.thumbnail == '':
-            self.article.thumbnail = self.getImages(self.article.url)
+        try:
+            self.article.sourceId = sourceId
+            self.article.authorName = self.getAuthorName(tweet)
+            self.article.authorImage = self.getAuthorImage(tweet)
+            self.article.description = self.getDescription(tweet)
+            self.article.tags = self.getTags(searchValue)
+            self.article.pubDate = self.getPublishDate()
+            self.article.thumbnail = self.getThumbnail()
+            if self.article.thumbnail == '':
+                self.article.thumbnail = self.getImages(self.article.url)
+        except Exception as e:
+            self.logger.error(f"Failed to parse '{self.article.url}'.  Skipping over the object. Error: {e}")
 
     def __newArticle__(self) -> Articles:
         return Articles()
@@ -149,9 +152,11 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
     def __init__(self):
         self.logger = Logger(__class__)
         self.cache = Cache()
-        self.settings = TwitterSettings(
+        self.settings = EnvTwitterConfig(
+            apiKey=getenv('NEWSBOT_TWITTER_API_KEY'),
+            apiKeySecret=getenv("NEWSBOT_TWITTER_API_KEY_SECRET"),
             ignoreRetweet=self.cache.findBool("twitter.ignore.retweet"),
-            preferedLanguage=self.cache.find("twitter.preferred.lang")
+            preferredLang=self.cache.find("twitter.preferred.lang")
         )
         self.parser = TweetParser()
         self.setSiteName(SourcesEnum.TWITTER)
@@ -159,14 +164,17 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         self.baseUri = self.uri
 
     def getArticles(self) -> List[Articles]:
+        if self.settings.apiKey == "":
+            raise Exception("NEWSBOT_TWITTER_API_KEY is missing a value")
+
+        if self.settings.apiKeySecret == "" or self.settings.apiKeySecret is None:
+            raise Exception("NEWSBOT_TWITTER_API_KEY_SECRET is missing a value")
+
         self.parser.driverStart()
         allArticles: List[Articles] = list()
 
         # Authenicate with Twitter
-        appAuth = AppAuthHandler(
-            consumer_key=getenv("NEWSBOT_TWITTER_API_KEY"),
-            consumer_secret=getenv("NEWSBOT_TWITTER_API_KEY_SECRET"),
-        )
+        appAuth = AppAuthHandler(consumer_key=self.settings.apiKey, consumer_secret=self.settings.apiKeySecret)
 
         # auth to twitter
         try:
@@ -200,19 +208,24 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
 
     def getTweets(self, api: API, username: str = "", hashtag: str = "") -> List:
         tweets = list()
-        if username != "":
-            for tweet in Cursor(api.user_timeline, id=username).items(15):
-                tweets.append(tweet)
 
-        if hashtag != "":
-            for tweet in Cursor(api.search, q=f"#{hashtag}").items(15):
-                tweets.append(tweet)
-        return tweets
+        try:
+            if username != "":
+                for tweet in Cursor(api.user_timeline, id=username).items(15):
+                    tweets.append(tweet)
+
+            if hashtag != "":
+                for tweet in Cursor(api.search, q=f"#{hashtag}").items(15):
+                    tweets.append(tweet)
+        except Exception as e:
+            self.logger.error("{e}")
+        finally:
+            return tweets
 
     def convertTweetsToArticles(self, tweets: List, searchValue: str, isHashtag: bool) -> List[Articles]:
         _list = list()
         for tweet in tweets:
-            lang = self.settings.preferedLanguage
+            lang = self.settings.preferredLang
             if lang == "None":
                 pass
             elif tweet.lang == lang:
@@ -225,9 +238,12 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             if isRetweet is True:
                 continue
 
+            
             self.parser.start(tweet=tweet, sourceId=self.getActiveSourceID(), searchValue=searchValue)
-            if self.parser.exists is False:
-                _list.append(self.parser.article)
+            if self.parser.exists is True:
+                continue
+
+            _list.append(self.parser.article)
 
         return _list
 

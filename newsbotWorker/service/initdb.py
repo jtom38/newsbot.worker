@@ -15,7 +15,7 @@ from newsbotWorker.infra.models import (
     ,EnvDiscordDetails
 )
 from newsbotWorker.infra.enum import SourcesEnum, SourceTypeEnum
-from newsbotWorker.infra.models import Icons, Settings, Sources, DiscordWebHooks
+from newsbotWorker.infra.models import Icons, Settings, Sources, DiscordWebHooks, SourceLinks
 from newsbotWorker.service.db import *
 from newsbotWorker.service.envReaderService import EnvReaderService
 from typing import List
@@ -52,7 +52,7 @@ class UpdateSource(IUpdateSource):
                 sl = SourceLinks(
                     discordName=f"{l.name}", 
                     discordID=l.id, 
-                    SourcesSource=source.name, 
+                    sourceName=source.name, 
                     sourceType=source.source,
                     sourceID=source.id
                 )

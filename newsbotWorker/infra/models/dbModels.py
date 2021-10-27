@@ -117,8 +117,8 @@ class Icons():
 
 @dataclass
 class Settings():
-    key: str
-    value: str
+    key: str = ''
+    value: str = ''
     options: str = ''
     notes: str = ''
     id: Optional[str] = ''
@@ -126,24 +126,24 @@ class Settings():
     
 @dataclass
 class SourceLinks():
-    sourceID: str
-    sourceName: str
-    sourceType: str
-    discordName: str
-    discordID: str
     id: Optional[str] = ''
+    sourceID: str = ''
+    sourceName: str = ''
+    sourceType: str = ''
+    discordName: str = ''
+    discordID: str =''
 
 
 @dataclass
 class Sources():
-    site: str
-    name: str
-    source: str
-    value: str
-    enabled: bool
-    url: str
-    tags: str
-    fromEnv: bool
-    type: SourceTypeEnum = SourceTypeEnum.INVALID
     id: Optional[str] = ''
+    site: str = ''
+    name: str = ''
+    source: str = ''
+    enabled: bool = False
+    url: str = ''
+    tags: str = ''
+    fromEnv: bool = False
+    type: SourceTypeEnum = SourceTypeEnum.INVALID
+    value: str = ''
     
