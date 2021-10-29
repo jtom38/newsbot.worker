@@ -115,3 +115,6 @@ class EnvFinalFantasyXIVDetails:
     updateEnabled: bool = False
     statusEnabled: bool = False
 
+@dataclass
+class EnvLogger():
+    isSimple: str = 'false'

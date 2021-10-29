@@ -24,12 +24,14 @@ class ApiEventsService():
         ss = SchedulerService()
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init,trigger=SchedulerTriggerEnum.INTERVAL,interval= True,minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(YoutubeWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
+        ss.addJob(SchedulerJobModel(functionName=WorkerService(YoutubeWorkerService()).init, trigger=SchedulerTriggerEnum.NONE ))
+
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(TwitterWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(TwitchWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(PokemonGoWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
         #ss.addJob(SchedulerJobModel(functionName=WorkerService(FFXIVWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
 
-        ss.addJob(SchedulerJobModel(functionName=DiscordOutputService().init, trigger=SchedulerTriggerEnum.INTERVAL, interval=True, minutes=1))
+        ss.addJob(SchedulerJobModel(functionName=DiscordOutputService().init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=3))
         ss.start()
 
     def shutdown(self) -> None:

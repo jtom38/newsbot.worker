@@ -1,4 +1,4 @@
-from newsbotWorker.service.logger import Logger
+from newsbotWorkerApiService.logger import Logger
 
 class DemoJobService():
     def __init__(self) -> None:

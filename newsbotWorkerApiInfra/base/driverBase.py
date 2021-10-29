@@ -9,7 +9,7 @@ class DriverBase():
     def __init__(self) -> None:
         self.logger = Logger(__class__)
         self.uri: str = ''
-        self.__driver__: Firefox = self.driverStart()
+        #self.__driver__: Firefox = self.driverStart()
 
     def driverGetContent(self) -> str:
         try:

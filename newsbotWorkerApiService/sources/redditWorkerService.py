@@ -57,6 +57,7 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
 
     def cachePageDetails(self, subreddit: str) -> None:
         self.driver = self.driverStart()
+        self.__driver__ = self.driver
         soup = self.getSubRedditSoup(subreddit)
         subTagline = self.findTagline(soup)
         if subTagline != "":
@@ -121,7 +122,7 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             raise Exception("Unable to collect posts from an unknown subreddit.  Please define the subreddit to collect form.")
         rootUri = f"https://reddit.com/r/{subreddit}"
 
-        if self.settingPullHot == False and self.settingPullTop == False:
+        if self.config.pullHot == False and self.config.pullTop == False:
             self.settingPullTop = True
 
         jsonUrl: str = ''

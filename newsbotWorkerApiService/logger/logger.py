@@ -1,8 +1,10 @@
 from newsbotWorkerApiInfra.enum import LogLevels
+from newsbotWorkerApiInfra.models import EnvLogger
 from newsbotWorkerApiInfra.domain import LoggerInterface
 from datetime import datetime
 from inspect import getframeinfo, stack
 from os.path import exists
+from os import getenv
 
 class LoggerCommon():
     def getLevelWithPadding(self, level: str) -> str:
@@ -58,6 +60,12 @@ class LoggerStdOut(LoggerCommon):
         level = self.getLevelWithPadding(level)
         callerClass = self.cleanCallerClass()
         line: str = self.getStdoutLineNumber()
+        if self.config.isSimple.lower() == 'true':
+            t = callerClass.split('.')
+            l = len(t)
+            start = l - 1
+            callerClass = f"{t[start]}"
+            pass
         line: str = f"{dt} | {level.upper()} | {callerClass}.{self.callerMethod}:{line} | {message}"
         print(line)
         return line
@@ -96,6 +104,9 @@ class Logger(LoggerInterface, LoggerStdOut, LoggerFile):
         self.callerClass: str = str(callerClass)
         self.logFile: str = './mounts/logs/newsbot.log'
         self.file = LoggerFile()
+        self.config = EnvLogger(
+            isSimple=getenv("NEWSBOT_LOGGER_MODE_SIMPLE")
+        )
         pass
 
     def debug(self, message: str) -> None:

@@ -6,8 +6,8 @@ from newsbotWorkerApiInfra.enum import SchedulerTriggerEnum
 class SchedulerJobModel():
     functionName: object
     trigger: SchedulerTriggerEnum
-    interval: bool
-    minutes: int
+    #interval: bool 
+    minutes: int = 5
 
 class SchedulerActveJobsModel(BaseModel):
     name: str

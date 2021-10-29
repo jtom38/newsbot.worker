@@ -38,7 +38,6 @@ class SchedulerService():
         __scheduler__.shutdown()
 
     def addJob(self, job: SchedulerJobModel) -> None:
-
         if job.trigger == SchedulerTriggerEnum.INTERVAL:
             __scheduler__.add_job(job.functionName, "interval", minutes=job.minutes,max_instances=1)
         else:
