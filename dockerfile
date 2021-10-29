@@ -33,4 +33,4 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckod
 #	export PATH="$HOME/.local/bin:$PATH" && \
 #	poetry install --no-dev
 
-CMD ["uvicorn", "newsbotWorker.api.appapp", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "newsbotWorkerApi.app:app", "--host", "0.0.0.0", "--port", "8001"]
