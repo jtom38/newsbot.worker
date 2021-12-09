@@ -28,11 +28,11 @@ RUN pip3 install -r requirements.txt
 #	python /tmp/install-poetry.py -y && \
 #	poetry install --no-root
 
-RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz && \
-	tar xf geckodriver-v0.29.1-linux64.tar.gz && \
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz && \
+	tar xf geckodriver-v0.30.0-linux64.tar.gz && \
 	chmod +x geckodriver && \
 	mv geckodriver /usr/local/bin && \
-	rm geckodriver-v0.29.1-linux64.tar.gz
+	rm geckodriver-v0.30.0-linux64.tar.gz
 
 RUN wget https://github.com/crate-ci/typos/releases/download/v1.0.3/typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz && \
 	tar xf typos-v1.0.3-x86_64-unknown-linux-gnu.tar.gz && \
