@@ -17,20 +17,15 @@ RUN echo deb http://deb.debian.org/debian/ unstable main contrib non-free >> /et
 	&& apt-get clean \
 	&& apt-get autoclean
 
-COPY . /app
-WORKDIR /app
-
-RUN pip3 install -r requirements.txt
-
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz && \
 	tar xf geckodriver-v0.30.0-linux64.tar.gz && \
 	chmod +x geckodriver && \
 	mv geckodriver /usr/local/bin && \
 	rm geckodriver-v0.30.0-linux64.tar.gz
 	
-#RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -o /tmp/install-poetry.py && \
-#	python /tmp/install-poetry.py -y && \
-#	export PATH="$HOME/.local/bin:$PATH" && \
-#	poetry install --no-dev
-
+RUN poetry config virtualenvs.create false && \
+		poetry install --no-interaction --no-ansi
+COPY . /app
+WORKDIR /app
+RUN poetry install
 CMD ["uvicorn", "workerApi.app:app", "--host", "0.0.0.0", "--port", "8001"]

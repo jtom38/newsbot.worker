@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi_healthcheck import HealthCheckFactory, healthCheckRoute
+from fastapi_healthcheck_uri import HealthCheckUri
 from workerApi.routes import SchedulerRouter, RedditRouter
 from workerService.api import ApiEventsService
 
@@ -12,10 +14,9 @@ app = FastAPI(
 app.include_router(SchedulerRouter)
 app.include_router(RedditRouter)
 
-#@app.get('/health')
-#def healthCheck() -> HealthModel:
-#    hs = HealthService().check()
-#    return hs.check
+_health = HealthCheckFactory()
+_health.add(HealthCheckUri(connectionUri='https://reddit.com/r/aww.json', alias='reddit', tags=('reddit', "uri")))
+app.add_api_route('/health', endpoint=healthCheckRoute(_health))
 
 @app.on_event('startup')
 def startupEvent() -> None:
