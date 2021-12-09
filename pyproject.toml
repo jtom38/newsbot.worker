@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "newsbot-worker"
+version = "0.9.0"
+description = "The backend agent to collect and send notifications."
+authors = ["James Tombleson <luther38@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.70.0"
+selenium = "^4.0.0"
+APScheduler = "^3.8.0"
+uvicorn = "^0.15.0"
+fastapi-healthcheck = "^0.2.3"
+fastapi-healthcheck-sqlalchemy = "^0.1.0"
+fastapi-healthcheck-uri = "^0.1.0"
+discord-webhook = "^0.14.0"
+beautifulsoup4 = "^4.10.0"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.910"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
