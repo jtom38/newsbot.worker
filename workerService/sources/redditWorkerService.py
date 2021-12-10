@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from json import loads
 
 
-class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
+class RedditWorkerService(SourcesBase, SourcesInterface):
     _logger: LoggerInterface
     _driver: DriverInterface
     _cache: CacheFactory
@@ -63,8 +63,7 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         return allArticles
 
     def cachePageDetails(self, subreddit: str) -> None:
-        self._driver = self._driverStart()
-        self.__driver__ = self._driver
+        self._driver.start()
         soup = self.getSubRedditSoup(subreddit)
         subTagline = self.findTagline(soup)
         if subTagline != "":
@@ -75,14 +74,14 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
 
         authorImage = self.findSubThumbnail(soup)
         self._cache.add(key=f"reddit.{subreddit}.authorImage", value=authorImage)
-        self._driverClose()
+        self._driver.close()
         pass
 
     def getSubRedditSoup(self, subreddit: str) -> BeautifulSoup:
         # Collect values that we do not get from the RSS
         uri = f"https://www.reddit.com/r/{subreddit}/"
-        self._driverGoTo(uri)
-        soup = self.getParser(seleniumContent=self._driverGetContent())
+        self._driver.goTo(uri)
+        soup = self.getParser(seleniumContent=self._driver.getContent())
         return soup
 
     def findSubThumbnail(self, soup: BeautifulSoup) -> str:
