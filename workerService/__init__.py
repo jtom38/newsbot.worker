@@ -1,5 +1,5 @@
 from .twitchApi import TwitchAPI
-from .initdb import InitDb
+from ..archive.initdb import InitDb
 from .scheduler import SchedulerService, __scheduler__
 from .cache import CacheFactory, SqlCache
 from .logger.loggerOld import Logger

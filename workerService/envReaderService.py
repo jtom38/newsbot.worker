@@ -37,14 +37,15 @@ class EnvReaderService():
     def __init__(self) -> None:
         load_dotenv('.env')
 
-    def getValue(self, key: EnvEnum) -> str:
+    def getValue(self, key: EnvEnum, required: bool = False) -> str:
         try:
             res = environ[key.value]
         except:
-            return ""
-            
-        if res == '' or res == None:
-            raise Exception("No value was returned from the env.")
+            res = ''
+
+        if required == True:
+            if res == '':
+                raise Exception("No value was returned from the env.")
 
         if res.isnumeric() == True:
             return int(res)

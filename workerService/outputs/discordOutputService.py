@@ -63,6 +63,8 @@ class DiscordFormatter(ConvertHtml, OutputFormatterInterface):
 
 class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
     _logger: LoggerInterface
+    _article: Articles
+    _source: Sources
 
     def __init__(self) -> None:
         self.enableTables()

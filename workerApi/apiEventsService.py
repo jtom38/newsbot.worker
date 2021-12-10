@@ -37,7 +37,7 @@ class ApiEventsService():
         #self._scheduler.addJob(self.enableSourcePokemonGo())
         #self._scheduler.addJob(self.enableSourceFFXIV())
 
-        #self._scheduler.addJob(self.enableOutputDiscord())
+        self._scheduler.addJob(self.enableOutputDiscord())
 
         self._scheduler.start()
 
