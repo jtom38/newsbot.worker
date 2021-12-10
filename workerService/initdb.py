@@ -17,7 +17,7 @@ from workerInfra.models import (
 from workerInfra.enum import SourcesEnum, SourceTypeEnum
 from workerInfra.models import Icons, Settings, Sources, DiscordWebHooks, SourceLinks
 from workerService.db import *
-from workerService.envReaderService import EnvReaderService
+from workerService.envReaderServiceOld import EnvReaderService
 from typing import List
 from abc import ABC, abstractclassmethod
 

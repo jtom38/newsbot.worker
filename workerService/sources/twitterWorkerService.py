@@ -1,9 +1,11 @@
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.models import Articles, Sources, EnvTwitterConfig
 from workerInfra.enum import SourcesEnum
 from workerInfra.domain import SourcesInterface, SourceParseInterface
 from workerInfra.base import ParserBase, SourcesBase
 from workerService.db import ArticlesTable
-from workerService import Logger, Cache, FirefoxDriverService
+from workerService import CacheFactory, SqlCache, FirefoxDriverService
+from workerService.logger import BasicLoggerService
 from tweepy import AppAuthHandler, API, Cursor
 from typing import List
 import tweepy
@@ -11,8 +13,10 @@ from os import getenv
 
 
 class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
+    logger: LoggerInterface
+
     def __init__(self) -> None:
-        self.logger = Logger(__class__)
+        self.logger = BasicLoggerService()
         pass
 
     def start(self, tweet: object, sourceId: str, searchValue: str):

@@ -3,7 +3,8 @@ from workerInfra.models import Sources, DiscordWebHooks, SourceLinks
 from workerInfra.enum import SourcesEnum
 from workerInfra.domain import LoggerInterface
 from workerService.db import SourcesTable, ArticlesTable, SourceLinksTable, DiscordWebHooksTable
-from workerService import Cache, Logger
+from workerService import CacheFactory, SqlCache
+from workerService.logger import BasicLoggerService
 from typing import List
 from requests import Response, get
 from bs4 import BeautifulSoup
@@ -73,7 +74,7 @@ class SourcesBase(SourceValidator):
     __links__: List[Sources] = list()
 
     def __init__(self) -> None:
-        self.logger: LoggerInterface = Logger(__class__)
+        self._logger: LoggerInterface = BasicLoggerService()
         self.__enableSource__()
         pass
 
@@ -85,7 +86,7 @@ class SourcesBase(SourceValidator):
     def __enableTables__(self) -> None:
         self.articlesTable = ArticlesTable()
         self.tableSources = SourcesTable()
-        self.cache: Cache = Cache()
+        self.cache: CacheFactory = CacheFactory(SqlCache())
 
     def setSiteName(self, siteName: SourcesEnum) -> None:
         self.siteName = siteName.value
@@ -120,7 +121,7 @@ class SourcesBase(SourceValidator):
             else:
                 return get(url=uri, headers=headers)
         except Exception as e:
-            self.logger.critical(f"Failed to collect data from {self.uri}. {e}")
+            self._logger.critical(f"Failed to collect data from {self.uri}. {e}")
 
     def getParser(
         self, requestsContent: Response = "", seleniumContent: str = ""
@@ -131,7 +132,7 @@ class SourcesBase(SourceValidator):
             else:
                 return BeautifulSoup(requestsContent.content, features="html.parser")
         except Exception as e:
-            self.logger.critical(f"failed to parse data returned from requests. {e}")
+            self._logger.critical(f"failed to parse data returned from requests. {e}")
 
     def getHeaders(self) -> dict:
         return {"User-Agent": "NewsBot - Automated News Delivery"}

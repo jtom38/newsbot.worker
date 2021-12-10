@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi_healthcheck import HealthCheckFactory, healthCheckRoute
 from fastapi_healthcheck_uri import HealthCheckUri
 from workerApi.routes import SchedulerRouter, RedditRouter
-from workerService.api import ApiEventsService
+from .apiEventsService import ApiEventsService
 
 
 app = FastAPI(

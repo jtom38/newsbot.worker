@@ -1,16 +1,27 @@
 from typing import List
 from bs4 import BeautifulSoup
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.enum import SourcesEnum, FFXIVTopicsEnum
 from workerInfra.models import Articles
 from workerInfra.domain import SourcesInterface
 from workerInfra.base import SourcesBase
-from workerService.logger import Logger
+from workerService.cache import CacheFactory, SqlCache
+from workerService.logger import BasicLoggerService
 from workerService.db import SourcesTable
 
 
 class FFXIVWorkerService(SourcesBase, SourcesInterface):
+    _logger: LoggerInterface
+    _cache: CacheFactory
+    uri: str
+    isSourceEnabled: bool
+    isOutputDiscordEnabled: bool
+    siteName: str
+
     def __init__(self) -> None:
-        self.logger = Logger(__class__)
+        #self._logger = Logger(__class__)
+        self._logger = BasicLoggerService()
+        self._cache = CacheFactory(SqlCache())
         self.uri: str = "https://na.finalfantasyxiv.com/lodestone/news/"
         self.baseUri: str = "https://na.finalfantasyxiv.com"
         self.setSiteName(SourcesEnum.FINALFANTASYXIV)
@@ -20,7 +31,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
 
     def getArticles(self) -> List[Articles]:
         allArticles: List[Articles] = list()
-        self.logger.debug(f"{self.siteName} - Checking for updates.")
+        self._logger.debug(f"{self.siteName} - Checking for updates.")
         rootPage = self.getParser(requestsContent=self.getContent())
 
         for site in self.__links__:
@@ -69,7 +80,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
                 l.append(a)
             return l
         except Exception as e:
-            self.logger.error(f"Failed to collect 'Topics' from FFXIV. {e}")
+            self._logger.error(f"Failed to collect 'Topics' from FFXIV. {e}")
 
     def getNotices(self, page: BeautifulSoup) -> List[Articles]:
         l = list()
@@ -94,7 +105,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
                 l.append(a)
             return l
         except Exception as e:
-            self.logger.error(f"Failed to collect 'Notice' from FFXIV. {e}")
+            self._logger.error(f"Failed to collect 'Notice' from FFXIV. {e}")
             pass
 
     def getMaintenances(self, page: BeautifulSoup) -> List[Articles]:
@@ -121,7 +132,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
                 l.append(a)
             return l
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to collect 'Maintenance' records from FFXIV. {e}"
             )
             pass
@@ -150,7 +161,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
                 l.append(a)
             return l
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to collect 'Updates' records from FFXIV. {e}"
             )
             pass
@@ -183,7 +194,7 @@ class FFXIVWorkerService(SourcesBase, SourcesInterface):
                 l.append(a)
             return l
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to collect 'Status' records from FFXIV. {e}"
             )
             pass

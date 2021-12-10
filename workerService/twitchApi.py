@@ -1,12 +1,16 @@
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.models import TwitchAuth, TwitchChannel, TwitchClip, TwitchGameData, TwitchStream, TwitchUser, TwitchVideo
-from workerService.logger import Logger
+from workerService.logger import BasicLoggerService
 from requests import get, post
 from json import loads
 from typing import List, Dict
 from os import getenv
 
 class TwitchAPI:
+    _logger = LoggerInterface
+
     def __init__(self):
+        self._logger = BasicLoggerService()
         self.uri: str = "https://id.twitch.tv"
         self.apiUri: str = "https://api.twitch.tv/helix"
         pass
@@ -22,7 +26,7 @@ class TwitchAPI:
 
         res = post(uri)
         if res.status_code != 200:
-            Logger(__class__).error(res.text)
+            self._logger.error(res.text)
             raise Exception("Failed to auth with Twitch.  Make sure NEWSBOT_TWITCH_CLIENT_ID anf NEWSBOT_TWITCH_CLIENT_SECRET are defined.")
         else:
             token = loads(res.content)
@@ -41,7 +45,7 @@ class TwitchAPI:
         uri = f"{self.apiUri}/users?login={username}"
         res = get(uri, headers=self.__header__(auth))
         if res.status_code != 200:
-            Logger().error(
+            self._logger.error(
                 f"Failed to get user information. StatusCode: {res.status_code}, Error: {res.text}"
             )
         else:
@@ -49,13 +53,13 @@ class TwitchAPI:
             if len(json["data"]) == 1:
                 user = TwitchUser(json["data"][0])
             else:
-                Logger().error(f"Did not get a usable object.")
+                self._logger.error(f"Did not get a usable object.")
                 user = TwitchUser({})
             return user
 
     def searchForUser(self, auth: TwitchAuth, username: str = "") -> None:
         if username == "":
-            Logger().error(
+            self._logger.error(
                 f"Request to search for user was requested but no user was given."
             )
         else:
@@ -63,7 +67,7 @@ class TwitchAPI:
             header = self.__header__(auth)
             res = get(uri, headers=header)
             if res.status_code != 200:
-                Logger().error(
+                self._logger.error(
                     f"Attempted to pull user information but failed. status_code: {res.status_code}, output: {res.text}"
                 )
             else:
@@ -84,7 +88,7 @@ class TwitchAPI:
         res = get(uri, headers=headers)
 
         if res.status_code != 200:
-            Logger().error(
+            self._logger.error(
                 f"Attempted to get Twich Game data but failed on game_id: {game_id}. output: {res.text}"
             )
             return TwitchGameData()
@@ -110,7 +114,7 @@ class TwitchAPI:
         res = get(uri, headers=self.__header__(auth))
         videos = list()
         if res.status_code != 200:
-            Logger().error(f"Failed to request videos")
+            self._logger.error(f"Failed to request videos")
             return videos
         else:
             json = loads(res.content)
@@ -129,7 +133,7 @@ class TwitchAPI:
         elif game_id != 0:
             uri = f"{uri}?game_id={game_id}"
         else:
-            Logger().error(
+            self._logger.error(
                 f"Clips was requested but was given invalid parameters, returning empty object."
             )
             return ""
@@ -137,7 +141,7 @@ class TwitchAPI:
         res = get(uri, headers=self.__header__(auth))
         clips = list()
         if res.status_code != 200:
-            Logger().error(
+            self._logger.error(
                 f"Clips request returned a bad status_code. Code: {res.status_code}, Error: {res.text}"
             )
             return clips
@@ -164,7 +168,7 @@ class TwitchAPI:
         res = get(uri, headers=self.__header__(auth))
         streams = list()
         if res.status_code != 200:
-            Logger().error(
+            self._logger.error(
                 f"Streams request returned a bad status_code. Code: {res.status_code}, Error: {res.test}"
             )
             return streams

@@ -1,1 +1,2 @@
-from .logger import Logger
+#from .loggerOld import Logger
+from .logger import BasicLoggerService

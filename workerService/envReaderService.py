@@ -1,6 +1,6 @@
 from os import environ
 from dotenv import load_dotenv
-from workerInfra.enum import EnvReaderEnum
+from workerInfra.enum import EnvEnum
 
 
 class EnvBase():
@@ -37,7 +37,7 @@ class EnvReaderService():
     def __init__(self) -> None:
         load_dotenv('.env')
 
-    def getValue(self, key: EnvReaderEnum) -> str:
+    def getValue(self, key: EnvEnum) -> str:
         try:
             res = environ[key.value]
         except:

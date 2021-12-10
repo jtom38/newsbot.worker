@@ -30,7 +30,7 @@ class SchedulerService():
         pass
 
     def start(self) -> None:
-        print("Scheduler has started.")
+        #print("Scheduler has started.")
         __scheduler__.start()
 
     def shutdown(self) -> None:
@@ -38,6 +38,9 @@ class SchedulerService():
         __scheduler__.shutdown()
 
     def addJob(self, job: SchedulerJobModel) -> None:
+        if job.enabled == False:
+            return None
+            
         if job.trigger == SchedulerTriggerEnum.INTERVAL:
             __scheduler__.add_job(job.functionName, "interval", minutes=job.minutes,max_instances=1)
         else:

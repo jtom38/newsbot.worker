@@ -1,13 +1,16 @@
 from time import sleep
-from workerService.logger import Logger
+from workerInfra.domain.loggerInterface import LoggerInterface
+from workerService.logger import BasicLoggerService
 from selenium.webdriver import Firefox
 from os.path import exists
 from os import remove
 
 
 class DriverBase():
+    _logger: LoggerInterface
+
     def __init__(self) -> None:
-        self.logger = Logger(__class__)
+        self.logger = BasicLoggerService()
         self.uri: str = ''
         #self.__driver__: Firefox = self.driverStart()
 

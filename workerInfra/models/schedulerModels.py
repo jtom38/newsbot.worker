@@ -8,6 +8,7 @@ class SchedulerJobModel():
     trigger: SchedulerTriggerEnum
     #interval: bool 
     minutes: int = 5
+    enabled: bool = True
 
 class SchedulerActveJobsModel(BaseModel):
     name: str

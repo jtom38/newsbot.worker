@@ -1,14 +1,15 @@
+from logging import Logger
 from typing import List
 import re
 from time import sleep
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.enum import SourcesEnum
 from workerInfra.models import Articles, Sources, SourceLinks, DiscordQueue, DiscordWebHooks
 from workerInfra.domain import OutputInterface, OutputFormatterInterface
 from workerInfra.base import OutputBase
 from workerInfra.exceptions import DiscordWebHookNotFound
 from workerInfra.base import ConvertHtml
-from workerService import Logger
-from workerService.logger import Logger
+from workerService.logger import BasicLoggerService
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from requests import Response
 
@@ -61,9 +62,11 @@ class DiscordFormatter(ConvertHtml, OutputFormatterInterface):
 
 
 class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
+    _logger: LoggerInterface
+
     def __init__(self) -> None:
         self.enableTables()
-        self.logger = Logger(__class__)
+        self._logger = BasicLoggerService()
         self.tempMessage: DiscordWebhook = DiscordWebhook("placeholder")
         self.article: Articles
         self.source: Sources
@@ -71,7 +74,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
 
     def init(self) -> None:
         try:
-            self.logger.debug("Checking DiscordQueue for objects.")
+            self._logger.debug("Checking DiscordQueue for objects.")
             queue = self.tableDiscordQueue.getAll()
             for i in queue:
                 self.article = self.tableArticles.getById(i.articleId)
@@ -84,9 +87,9 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
                     raise Exception("Source requested from the API did not contain a valid Sources.Source")
 
                 if self.article.title != "":
-                    self.logger.info(f"Discord - Sending article '{self.article.title}'")
+                    self._logger.info(f"Discord - Sending article '{self.article.title}'")
                 else:
-                    self.logger.info(f"Discord - Sending article '{self.article.description}'")
+                    self._logger.info(f"Discord - Sending article '{self.article.description}'")
 
                 self.buildMessage(self.article, self.source)
                 resp = self.sendMessage()
@@ -96,9 +99,9 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
 
                 self.webhooks.clear()
                 sleep(15)
-            self.logger.debug("Local queue is now empty.  Service is exiting.")
+            self._logger.debug("Local queue is now empty.  Service is exiting.")
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to post a message. {self.article.title}. Status_code: {resp[0].status_code}. OK: {resp[0].ok}. error {e}"
             )
 
@@ -158,7 +161,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
                 else:
                     embed.set_image(url=article.thumbnail)
         except Exception as e:
-            self.logger.warning(
+            self._logger.warning(
                 f"Failed to attach a thumbnail. \r\n {e}\r\n thumbnails: {article.thumbnail}"
             )
 
@@ -179,7 +182,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         try:
             res = self.convertToList(self.tempMessage.execute())
         except Exception as e:
-            self.logger.critical(
+            self._logger.critical(
                 f"Failed to send to Discord.  Check to ensure the webhook is correct. Error: {e}"
             )
         return res
@@ -203,7 +206,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
             elif r.status_code == 200:
                 pass
             else:
-                self.logger.error("Found a invalid response code.  Expected 204.  Check the webhooks to make sure they are correct.")
+                self._logger.error("Found a invalid response code.  Expected 204.  Check the webhooks to make sure they are correct.")
                 safeToRemove = False
 
         return safeToRemove
@@ -232,7 +235,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
             return res.filename
 
         except Exception as e:
-            self.logger.error(f"Failed to find the author icon for type:{type} name:{name}")
+            self._logger.error(f"Failed to find the author icon for type:{type} name:{name}")
 
     def buildFooter(self, source: str, name: str, _type: str = '') -> str:
         footer = ""
@@ -276,7 +279,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
             res = table.getBySite(site=f"Default {sourceType}")
 
         if res.filename == "":
-            self.logger.error(f"Unable to find the default icon for '{sourceType}'.")
+            self._logger.error(f"Unable to find the default icon for '{sourceType}'.")
 
         return res.filename
 

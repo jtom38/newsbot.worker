@@ -1,17 +1,20 @@
 from workerInfra.domain import SourcesInterface
 from workerInfra.base import SourcesBase
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.enum import SourcesEnum
-from workerInfra.models import Articles, Sources
+from workerInfra.models import Articles
 from workerInfra.exceptions import UnableToFindContent
-from workerService.logger import Logger
+from workerService.logger import BasicLoggerService
 from typing import List
 from requests import Response
 from bs4 import BeautifulSoup
 import re
 
 class PokemonGoWorkerService(SourcesBase, SourcesInterface):
+    _logger: LoggerInterface
+
     def __init__(self) -> None:
-        self.logger = Logger(__class__)
+        self._logger = BasicLoggerService()
         self.uri = "https://pokemongohub.net/rss"
         self.setSiteName(SourcesEnum.POKEMONGO)
         self.authorName: str = "Pokemon Go Hub"
@@ -20,7 +23,7 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
 
     def getArticles(self) -> List[Articles]:
         for site in self.__links__:
-            self.logger.debug(f"{site.name} - Checking for updates.")
+            self._logger.debug(f"{site.name} - Checking for updates.")
 
             siteContent: Response = self.getContent()
             if siteContent.status_code != 200:
@@ -48,9 +51,9 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
                         item.thumbnail = self.getArticleThumbnail(item.url)
                         allArticles.append(item)
 
-                self.logger.debug(f"Pokemon Go Hub - Finished checking.")
+                self._logger.debug(f"Pokemon Go Hub - Finished checking.")
             except Exception as e:
-                self.logger.error(
+                self._logger.error(
                     f"Failed to parse articles from Pokemon Go Hub.  Chances are we have a malformed response. {e}"
                 )
 
@@ -103,4 +106,4 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
             res = bs.find_all("img", class_="entry-thumb")
             return res[0].attrs["src"]
         except Exception as e:
-            self.logger.error(f"Failed to pull Pokemon Go Hub thumbnail or {link}. {e}")
+            self._logger.error(f"Failed to pull Pokemon Go Hub thumbnail or {link}. {e}")

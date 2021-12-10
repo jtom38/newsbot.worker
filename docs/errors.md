@@ -1,4 +1,4 @@
-    `# NewsBot Error Codes
+# NewsBot Error Codes
 
 ## Selenium Errors
 

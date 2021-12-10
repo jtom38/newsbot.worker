@@ -3,7 +3,7 @@ from workerInfra.models import Articles, DiscordQueue
 from workerInfra.domain import SourcesInterface
 from workerService.db.tableDiscordQueue import DiscordQueueTable
 from workerService import EnvReaderService
-from workerService.logger import Logger
+from workerService.logger import BasicLoggerService
 from workerService.db import ArticlesTable
 
 
@@ -13,7 +13,7 @@ class WorkerService():
     """
 
     def __init__(self, source: SourcesInterface):
-        self.logger: LoggerInterface = Logger(__class__)
+        self.logger: LoggerInterface = BasicLoggerService
         self.enabled: bool = False
         self.env = EnvReaderService()
         self.source: SourcesInterface = source

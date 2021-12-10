@@ -5,13 +5,13 @@ from workerInfra.enum import SourcesEnum
 from workerInfra.domain import SourcesInterface
 from workerInfra.base import SourcesBase
 from workerService import FirefoxDriverService
-from workerService.logger import Logger
+from workerService.logger import BasicLoggerService
 from workerService.cache import Cache
 
 
 class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
     def __init__(self):
-        self.logger = Logger(__class__)
+        self.logger = BasicLoggerService()
         self.cache = Cache()
         self.uri: str = "https://youtube.com"
         self.setSiteName(SourcesEnum.YOUTUBE)
