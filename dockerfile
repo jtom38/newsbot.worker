@@ -23,9 +23,9 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckod
 	mv geckodriver /usr/local/bin && \
 	rm geckodriver-v0.30.0-linux64.tar.gz
 	
-RUN poetry config virtualenvs.create false && \
-		poetry install --no-interaction --no-ansi
+RUN pip3 install poetry
 COPY . /app
 WORKDIR /app
-RUN poetry install
+RUN poetry config virtualenvs.create false && \
+		poetry install --no-interaction --no-ansi
 CMD ["uvicorn", "workerApi.app:app", "--host", "0.0.0.0", "--port", "8001"]
