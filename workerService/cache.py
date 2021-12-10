@@ -1,6 +1,29 @@
+from typing import List
 from workerInfra.domain import CacheInterface
 from workerInfra.models import Settings
 from workerService.db import SettingsTable
+
+
+class CacheFactory():
+    __item__: CacheInterface
+
+    def __init__(self, item: CacheInterface) -> None:
+        self.__item__ = item
+
+    def find(self, key: str) -> str:
+        res = self.__item__.find(key)
+        return res
+
+    def findBool(self, key: str) -> bool:
+        res = self.__item__.findBool(key)
+        return res
+
+    def add(self, key: str, value: str) -> str:
+        self.__item__.add(key, value)
+        return value
+
+    def remove(self, key: str) -> None:
+        self.__item__.remove(key)
 
 
 class Cache():
