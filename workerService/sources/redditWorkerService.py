@@ -21,7 +21,7 @@ class RedditWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
     def __init__(self) -> None:
         self._logger = BasicLoggerService()
         self._cache = Cache()
-        self._driver = FirefoxDriverService()
+        self._driver = FirefoxDriverService(self._logger)
         self.uri = "https://reddit.com/r/aww/top.json"
         self.setSiteName(SourcesEnum.REDDIT)
         self.config = EnvRedditConfig(

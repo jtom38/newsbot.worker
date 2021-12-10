@@ -11,9 +11,12 @@ class WorkerService():
     """
     This is a generic worker that will contain the source it will monitor.
     """
+    logger: LoggerInterface
+    source: SourcesInterface
+    enabled: bool
 
     def __init__(self, source: SourcesInterface):
-        self.logger: LoggerInterface = BasicLoggerService
+        self.logger: LoggerInterface = BasicLoggerService()
         self.enabled: bool = False
         self.env = EnvReaderService()
         self.source: SourcesInterface = source
