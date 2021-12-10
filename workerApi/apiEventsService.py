@@ -31,7 +31,7 @@ class ApiEventsService():
 
     def startup(self) -> None:
         #self._scheduler.addJob(self.enableSourceReddit())
-        #self._scheduler.addJob(self.enableSourceYoutube())
+        self._scheduler.addJob(self.enableSourceYoutube())
         #self._scheduler.addJob(self.enableSourceTwitter())
         #self._scheduler.addJob(self.enableSourceTwitch())
         #self._scheduler.addJob(self.enableSourcePokemonGo())

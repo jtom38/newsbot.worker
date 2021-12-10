@@ -1,5 +1,7 @@
 from typing import List
 from bs4 import BeautifulSoup
+from workerInfra.domain.driverInterface import DriverInterface
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.models import Articles, Sources
 from workerInfra.enum import SourcesEnum
 from workerInfra.domain import SourcesInterface
@@ -9,10 +11,15 @@ from workerService.logger import BasicLoggerService
 from workerService.cache import Cache
 
 
-class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
+class YoutubeWorkerService(SourcesBase, SourcesInterface):
+    _logger: LoggerInterface
+    _driver: DriverInterface
+
     def __init__(self):
-        self.logger = BasicLoggerService()
+        self._logger: LoggerInterface = BasicLoggerService()
         self.cache = Cache()
+        self._driver: DriverInterface = FirefoxDriverService(self._logger)
+
         self.uri: str = "https://youtube.com"
         self.setSiteName(SourcesEnum.YOUTUBE)
         self.settingDebugScreenshots: bool = bool(self.cache.findBool(key='youtube.debug.screnshots'))
@@ -20,8 +27,7 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         pass
 
     def getArticles(self) -> List[Articles]:
-        self.logger.info("Checking YouTube for new content")
-        # self.driver = self.driverStart()
+        self._logger.info("Checking YouTube for new content")
 
         allArticles: List[Articles] = list()
 
@@ -29,17 +35,18 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             self.setActiveSource(source=SourcesEnum.YOUTUBE, name=site.name)
             self.authorName = ""
             self.authorImage = ""
-            self.logger.debug(f"{site.source} - {site.name} - Checking for updates")
+            self._logger.debug(f"{site.source} - {site.name} - Checking for updates")
 
             # pull the source code from the main youtube page
             channelID = self.cache.find(key=f"{site.source}.{site.name}.channelID")
             if channelID == "":
-                self.driver = self.driverStart()
-                self.driverGoTo(site.url)
+                #self._driverSession = self._driver.driverStart()
+                self._driver.start()
+                self._driver.goTo(site.url)
                 if self.settingDebugScreenshots is True:
-                    self.driverSaveScreenshot(f"youtube_step1_{site.name}.png")
+                    self._driver.saveScreenshot(f"youtube_step1_{site.name}.png")
 
-                siteContent: str = self.driverGetContent()
+                siteContent: str = self._driver.getContent()
                 page: BeautifulSoup = self.getParser(seleniumContent=siteContent)
                 channelID: str = self.getChannelId(page)
                 self.cache.add(key=f"youtube.{site.name}.channelID", value=channelID)
@@ -49,7 +56,7 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 # We are going to store them in the class.
                 self.setAuthorImage(page, site)
                 self.setAuthorName(page, site)
-                self.driverClose()
+                self._driver.close()
             else:
                 self.authorName = self.cache.find(key=f"youtube.{site.name}.authorName")
                 self.authorImage = self.cache.find(key=f"youtube{site.name}.authorImage")
@@ -73,8 +80,6 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                     a.sourceId = self.getActiveSourceID()
 
                     allArticles.append(a)
-
-        # self.driverClose()
         return allArticles
 
     def getChannelId(self, page: BeautifulSoup) -> str:
@@ -85,7 +90,7 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                     channelId = i.attrs["content"]
                     return channelId
             except Exception as e:
-                self.logger.error(f"Unable to find the ChannelId on the page.  Did the UI change? Error: {e}")
+                self._logger.error(f"Unable to find the ChannelId on the page.  Did the UI change? Error: {e}")
                 pass
 
         return ""
@@ -98,12 +103,12 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             )
             self.authorName = authorName[0].text
             if self.authorName is None or self.authorName == '':
-                self.logger.error(f"Failed to find the authorName for {site.name}.  CSS might have changed.")
+                self._logger.error(f"Failed to find the authorName for {site.name}.  CSS might have changed.")
             self.cache.add(
                 key=f"youtube.{site.name}.authorName", value=self.authorName
             )
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to find the authorName for {site.name}.  CSS might have changed. {e}"
             )
 
@@ -118,8 +123,8 @@ class YoutubeWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 )
                 self.authorImage = img
             else:
-                self.logger.error("Failed to find the AuthorImage on the youtube page.")
+                self._logger.error("Failed to find the AuthorImage on the youtube page.")
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to find the authorImage for {site.name}.  CSS might have changed. {e}"
             )

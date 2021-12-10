@@ -1,7 +1,6 @@
-from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.models import Articles, Sources, EnvTwitterConfig
 from workerInfra.enum import SourcesEnum
-from workerInfra.domain import SourcesInterface, SourceParseInterface
+from workerInfra.domain import SourcesInterface, SourceParseInterface, DriverInterface, LoggerInterface
 from workerInfra.base import ParserBase, SourcesBase
 from workerService.db import ArticlesTable
 from workerService import CacheFactory, SqlCache, FirefoxDriverService
@@ -12,11 +11,14 @@ import tweepy
 from os import getenv
 
 
-class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
-    logger: LoggerInterface
+class TweetParser(SourceParseInterface, ParserBase):
+    _logger: LoggerInterface
+    _driver: DriverInterface
 
     def __init__(self) -> None:
-        self.logger = BasicLoggerService()
+        self._logger = BasicLoggerService()
+        self._driver: DriverInterface = FirefoxDriverService
+        self._driver.start()
         pass
 
     def start(self, tweet: object, sourceId: str, searchValue: str):
@@ -47,7 +49,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
             if self.article.thumbnail == '':
                 self.article.thumbnail = self.getImages(self.article.url)
         except Exception as e:
-            self.logger.error(f"Failed to parse '{self.article.url}'.  Skipping over the object. Error: {e}")
+            self._logger.error(f"Failed to parse '{self.article.url}'.  Skipping over the object. Error: {e}")
 
     def __newArticle__(self) -> Articles:
         return Articles()
@@ -57,7 +59,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
             return tweet.author.profile_image_url
         except Exception as e:
             msg = f"Failed to find the tweet author screen name. Error: {e}"
-            self.logger.error(msg)
+            self._logger.error(msg)
             raise Exception(msg)
 
     def getAuthorName(self, tweet: object) -> str:
@@ -66,7 +68,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
             name: str = tweet.author.name
             return f"{name} @{screenName}"
         except Exception as e:
-            self.logger.error(f"Failed to find the tweet author. Error: {e}")
+            self._logger.error(f"Failed to find the tweet author. Error: {e}")
             raise Exception(f"Failed to find the tweet author. Error: {e}")
 
     def getDescription(self, tweet: object) -> str:
@@ -74,7 +76,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
             d = tweet.text
             return d
         except Exception as e:
-            self.logger.error(f"Attempted to pull tweet description, but failed. Error: {e}")
+            self._logger.error(f"Attempted to pull tweet description, but failed. Error: {e}")
 
     def getUrl(self) -> str:
         # a.url = f"https://twitter.com/{authorScreenName}/status/{tweet.id}"
@@ -90,7 +92,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
                 if "photo" in img["type"] and "twimg" in img["media_url"]:
                     return img["media_url"]
         except Exception as e:
-            self.logger.warning(f"Unable to find thumbnail. {e}")
+            self._logger.warning(f"Unable to find thumbnail. {e}")
             # I expect that this wont be found a lot, its not a problem.
             return ""
 
@@ -98,7 +100,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
         try:
             return str(self.__tweet__.created_at)
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to find 'created_at' on the tweet. \r\nError: {e}"
             )
 
@@ -109,7 +111,7 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
                 tags += f"{t['text']}, "
             return tags
         except Exception as e:
-            self.logger.error(
+            self._logger.error(
                 f"Failed to find 'hashtags' on the tweet. \r\nError: {e}"
             )
 
@@ -119,9 +121,8 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
             # We are going to try with Chrome to find the image.
             # It will try a couple times to try and find the image given the results are so hit and miss.
             album: str = ""
-            # self.driverStart()
-            self.driverGoTo(url)
-            source = self.driverGetContent()
+            self._driver.goTo(url)
+            source = self._driver.getContent()
             soup = self.getParser(seleniumContent=source)
             images = soup.find_all(name="img")  # attrs={"alt": "Image"})
             for img in images:
@@ -135,12 +136,12 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
                         # a.thumbnail = img.attrs['src']
                         # break
                 except Exception as e:
-                    self.logger.warning(f"Unable to find images in the tweet. Error: {e}")
+                    self._logger.warning(f"Unable to find images in the tweet. Error: {e}")
                     pass
 
             return album
         except Exception as e:
-            self.logger.warning("Failed to collect images.", e)
+            self._logger.warning("Failed to collect images.", e)
             pass
         pass
 
@@ -153,8 +154,10 @@ class TweetParser(SourceParseInterface, ParserBase, FirefoxDriverService):
 
 
 class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
+    _logger: LoggerInterface
+
     def __init__(self):
-        self.logger = Logger(__class__)
+        self._logger = BasicLoggerService()
         self.cache = Cache()
         self.settings = EnvTwitterConfig(
             apiKey=getenv('NEWSBOT_TWITTER_API_KEY'),
@@ -174,7 +177,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         if self.settings.apiKeySecret == "" or self.settings.apiKeySecret is None:
             raise Exception("NEWSBOT_TWITTER_API_KEY_SECRET is missing a value")
 
-        self.parser.driverStart()
+        #self.parser.driverStart()
         allArticles: List[Articles] = list()
 
         # Authenicate with Twitter
@@ -184,13 +187,13 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         try:
             api = API(appAuth)
         except Exception as e:
-            self.logger.critical(f"Failed to authenicate with Twitter. Error: {e}")
+            self._logger.critical(f"Failed to authenicate with Twitter. Error: {e}")
             return allArticles
 
         for _site in self.__links__:
             site: Sources = _site
             self.setActiveSource(source=SourcesEnum.TWITTER, name=site.name, sourceType=site.type)
-            self.logger.info(
+            self._logger.info(
                 f"Twitter - {site.type} - {site.name} - Checking for updates."
             )
 
@@ -207,7 +210,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 for i in articles:
                     allArticles.append(i)
 
-        self.parser.driverClose()
+        self.parser._driver. .close()
         return allArticles
 
     def getTweets(self, api: API, username: str = "", hashtag: str = "") -> List:
@@ -222,7 +225,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 for tweet in Cursor(api.search, q=f"#{hashtag}").items(15):
                     tweets.append(tweet)
         except Exception as e:
-            self.logger.error("{e}")
+            self._logger.error("{e}")
         finally:
             return tweets
 
@@ -256,7 +259,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         try:
             url = tweet.entities["urls"][0]["expanded_url"]
         except Exception as e:
-            self.logger.debug(f"Failed to find the URL to the exact tweet. Checking the second location. Error: {e}")
+            self._logger.debug(f"Failed to find the URL to the exact tweet. Checking the second location. Error: {e}")
             pass
 
         # if the primary locacation fails, try this location
@@ -264,7 +267,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             try:
                 url = tweet.entities["media"][0]["expanded_url"]
             except Exception as e:
-                self.logger.debug(f"Failed to find the tweet url in 'entities['media'][0]['expanded_url']. Error: {e}")
+                self._logger.debug(f"Failed to find the tweet url in 'entities['media'][0]['expanded_url']. Error: {e}")
                 pass
 
         # if its a retweet look here
@@ -272,14 +275,14 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
             try:
                 url = tweet.retweeted_status.entities["urls"][0]["expanded_url"]
             except Exception as e:
-                self.logger.debug(f"retweet did not contain entities.urls. Error: {e}")
+                self._logger.debug(f"retweet did not contain entities.urls. Error: {e}")
                 pass
 
         if url == "":
             try:
                 url = tweet.retweeted_status.entities["media"][0]["expanded_url"]
             except Exception as e:
-                self.logger.debug(f"retweet did not contain entities.media. Error: {e}")
+                self._logger.debug(f"retweet did not contain entities.media. Error: {e}")
                 pass
         return url
 
