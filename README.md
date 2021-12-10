@@ -1,4 +1,5 @@
-# Newsbot
+# newsbot.worker
+
 Automated and personalized news delivery for your community.
 
 ## What does it do
@@ -47,6 +48,10 @@ vi .env
 make docker-run
 ```
 
+### Master Branch
+
+Master branch is not a stable branch.  You can use it, but expect problems.  If you want a stable branch, use the tags that are bound to releases.
+
 ## Settings
 
 The application settings are currently stored in the .env file.  Use the template and apply the webhook links for the sites that you want to use.
@@ -55,7 +60,27 @@ The application settings are currently stored in the .env file.  Use the templat
 
 ### Discord Webhooks
 
-If you want to have a single source post to multiple webhooks, you can do that.  On the line where you enter your webhook separate each one with a space character.  The program will split them up and post updates to both webhooks.
+To send to Discord, add the following block to your env.
+
+```bash
+NEWSBOT_DISCORD_0_NAME=""
+NEWSBOT_DISCORD_0_SERVER="ServerName"
+NEWSBOT_DISCORD_0_CHANNEL="Channel"
+NEWSBOT_DISCORD_0_URL=https://discordapp.com/api/webhooks/...
+
+NEWSBOT_DISCORD_1_NAME="sn-c2"
+NEWSBOT_DISCORD_1_SERVER="ServerName"
+NEWSBOT_DISCORD_1_CHANNEL="Channel2"
+NEWSBOT_DISCORD_1_URL=https://discordapp.com/api/webhooks/...
+```
+
+This creates two references to different servers.  You can then call them by referencing the NAME value on each source.  You can also send to more then one by separating the names with a comma.
+
+```bash
+NEWSBOT_RSS_0_LINK_DISCORD="ServerName - Channel, sn-c2"
+```
+
+This one will now send to both webhooks.
 
 ## Sources
 
@@ -96,6 +121,8 @@ For the configuration of this source, see the Example Template.
 
 ### Instagram
 
+**Currently disabled**
+
 Instagram can monitor a users posts or a tag as long as they are public.  
 You can currently monitor up to 10 of each.
 This source will pull information from the web site directly so no API keys are required.
@@ -127,13 +154,33 @@ For the configuration of this source, see the Example Template
 ## Example Template
 
 ```ini
+#.env
+
+# API Connection
+# This is now required for the worker to run
+NEWSBOT_API_URI='http://newsbot_api_1:8000'
+
+# Discord Output
+# This will generate the name "ServerName - Channel" to be used as reference
+NEWSBOT_DISCORD_0_NAME=""
+NEWSBOT_DISCORD_0_SERVER="ServerName"
+NEWSBOT_DISCORD_0_CHANNEL="Channel"
+NEWSBOT_DISCORD_0_URL=https://discordapp.com/api/webhooks/...
+
+NEWSBOT_DISCORD_1_NAME="sn-c"
+NEWSBOT_DISCORD_1_SERVER="ServerName"
+NEWSBOT_DISCORD_1_CHANNEL="Channel"
+NEWSBOT_DISCORD_1_URL=https://discordapp.com/api/webhooks/...
+
+
 # Pokemon Go Hub Example
 NEWSBOT_POGO_ENABLED=true
 NEWSBOT_POGO_HOOK=https://discordapp.com/api/webhooks/...
+NEWSBOT_POGO_LINK_DISCORD="ServerName - Channel"
 
 # Phantasy Star Online 2 Example
 NEWSBOT_PSO2_ENABLED=true
-NEWSBOT_PSO2_HOOK=https://discordapp.com/api/webhooks/...
+NEWSBOT_PSO2_LINK_DISCORD="sn-c"
 
 # Final Fantasy XIV Example
 NEWSBOT_FFXIV_ALL=False
@@ -142,40 +189,48 @@ NEWSBOT_FFXIV_NOTICES=False
 NEWSBOT_FFXIV_MAINTENANCE=False
 NEWSBOT_FFXIV_UPDATES=False
 NEWSBOT_FFXIV_STATUS=False
-NEWSBOT_FFXIV_HOOK=https://discordapp.com/api/webhooks/...
+NEWSBOT_FFXIV_LINK_DISCORD="sn-c, ServerName-Channel"
 
 # Reddit Examples
-NEWSBOT_REDDIT_SUB_0=aww
-NEWSBOT_REDDIT_HOOK_0=https://discordapp.com/api/webhooks/...
-NEWSBOT_REDDIT_SUB_1=corgi
-NEWSBOT_REDDIT_HOOK_1=https://discordapp.com/api/webhooks/...
+NEWSBOT_REDDIT_0_SUBREDDIT=aww
+NEWSBOT_REDDIT_0_LINK_DISCORD="sn-c"
+NEWSBOT_REDDIT_1_SUBREDDIT=corgi
+NEWSBOT_REDDIT_1_LINK_DISCORD="sn-c"
+
+NEWSBOT_REDDIT_ALLOW_NSFW=true
+NEWSBOT_REDDIT_PULL_TOP=true
+NEWSBOT_REDDIT_PULL_HOT=false
 
 # YouTube Examples
-NEWSBOT_YOUTUBE_URL_0=https://www.youtube.com/user/gamegrumps
-NEWSBOT_YOUTUBE_HOOK_0=https://discordapp.com/api/webhooks/...
-NEWSBOT_YOUTUBE_NAME_0=GameGrumps
-
-# Instagram Examples
-NEWSBOT_INSTAGRAM_USER_NAME_0=madmax_fluffyroad
-NEWSBOT_INSTAGRAM_USER_HOOK_0=https://discordapp.com/api/webhooks/...
-NEWSBOT_INSTAGRAM_TAG_NAME_0=corgi
-NEWSBOT_INSTAGRAM_TAG_HOOK_0=https://discordapp.com/api/webhooks/...
+NEWSBOT_YOUTUBE_0_NAME=GameGrumps
+NEWSBOT_YOUTUBE_0_URL=https://www.youtube.com/user/gamegrumps
+NEWSBOT_YOUTUBE_0_LINK_DISCORD="sn-c"
+NEWSBOT_YOUTUBE_DEBUG_SCREENSHOTS = false
 
 # Twitter Examples
 # Twitter Developer Secrets
 NEWSBOT_TWITTER_API_KEY=
 NEWSBOT_TWITTER_API_KEY_SECRET=
+NEWSBOT_TWITTER_PREFERRED_LANG='en'
+NEWSBOT_TWITTER_IGNORE_RETWEET=true
 
 # User/Hashtag Examples
-NEWSBOT_TWITTER_USER_NAME_0=dodo
-NEWSBOT_TWITTER_USER_HOOK_0=https://discordapp.com/api/webhooks/...
-NEWSBOT_TWITTER_TAG_NAME_0=corgi
-NEWSBOT_TWITTER_TAG_HOOK_0=https://discordapp.com/api/webhooks/...
+NEWSBOT_TWITTER_0_NAME_0=dodo
+NEWSBOT_TWITTER_0_TYPE=USER
+NEWSBOT_TWITTER_0_LINK_DISCORD="sn-c"
+
+NEWSBOT_TWITTER_1_NAME=corgi
+NEWSBOT_TWITTER_1_TYPE=TAG
+NEWSBOT_TWITTER_1_LINK_DISCORD="sn-c"
 
 # Twitch Examples
 # Twitch Developer Secrets
-NEWSBOT_TWITCH_CLIENT_ID=
-NEWSBOT_TWITCH_CLIENT_SECRET=
+NEWSBOT_TWITCH_CLIENT_ID=''
+NEWSBOT_TWITCH_CLIENT_SECRET=''
+
+# Define what you want to monitor
+NEWSBOT_TWITCH_MONITOR_CLIPS=True
+NEWSBOT_TWITCH_MONITOR_VOD=True
 
 # Twitch Settings
 NEWSBOT_TWITCH_MONITOR_CLIPS=True
