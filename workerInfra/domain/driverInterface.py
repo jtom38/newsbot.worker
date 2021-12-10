@@ -3,26 +3,26 @@ from abc import ABC, abstractclassmethod
 
 class DriverInterface(ABC):
     @abstractclassmethod
-    def driverStart(self) -> object:
+    def start(self) -> object:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def driverGetContent(self) -> str:
+    def getContent(self) -> str:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def driverGoTo(self) -> None:
+    def goTo(self) -> None:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def driverSaveScreenshot(self, path: str) -> None:
+    def saveScreenshot(self, path: str) -> None:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def driverGetUrl(self) -> str:
+    def getUrl(self) -> str:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def driverClose(self, displayMsg: bool = True) -> None:
+    def close(self, displayMsg: bool = True) -> None:
         raise NotImplementedError()
         

@@ -1,7 +1,7 @@
+from selenium.webdriver.firefox.webdriver import WebDriver
 from workerInfra.base.driverBase import DriverBase
 from workerInfra.domain import DriverInterface, LoggerInterface
 from selenium.webdriver import Firefox, FirefoxOptions
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 
 class FirefoxDriverService(DriverBase, DriverInterface):
@@ -10,11 +10,12 @@ class FirefoxDriverService(DriverBase, DriverInterface):
     It was made to be used as a Base class for the sources who need Chrome.
     """
     _logger: LoggerInterface
+    __driver__: WebDriver
 
     def __init__(self, logger: LoggerInterface) -> None:
         self._logger = logger
 
-    def driverStart(self, displayMsg: bool = True) -> Firefox:
+    def driverStart(self) -> Firefox:
         try:
             self._logger.debug("Driver is starting up Firefox")
             o = FirefoxOptions()

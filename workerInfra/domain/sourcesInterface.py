@@ -1,10 +1,12 @@
 from abc import ABC, abstractclassmethod
 from typing import List
+from workerInfra.domain.loggerInterface import LoggerInterface
 from workerInfra.enum import SourcesEnum, SourceTypeEnum
 from workerInfra.models import Articles
 
 
 class SourcesInterface(ABC):
+    _logger: LoggerInterface
     uri: str = ''
     isSourceEnabled: bool = False
     isOutputDiscordEnabled: bool = False
