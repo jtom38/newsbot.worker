@@ -17,8 +17,7 @@ class TweetParser(SourceParseInterface, ParserBase):
 
     def __init__(self) -> None:
         self._logger = BasicLoggerService()
-        self._driver: DriverInterface = FirefoxDriverService
-        self._driver.start()
+        self._driver: DriverInterface = FirefoxDriverService(self._logger)
         pass
 
     def start(self, tweet: object, sourceId: str, searchValue: str):
@@ -153,19 +152,20 @@ class TweetParser(SourceParseInterface, ParserBase):
         return True
 
 
-class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
+class TwitterWorkerService(SourcesBase, SourcesInterface):
     _logger: LoggerInterface
+    _parser: TweetParser
 
     def __init__(self):
         self._logger = BasicLoggerService()
-        self.cache = Cache()
+        self._parser = TweetParser()
+        self.cache = CacheFactory(SqlCache())
         self.settings = EnvTwitterConfig(
             apiKey=getenv('NEWSBOT_TWITTER_API_KEY'),
             apiKeySecret=getenv("NEWSBOT_TWITTER_API_KEY_SECRET"),
             ignoreRetweet=self.cache.findBool("twitter.ignore.retweet"),
             preferredLang=self.cache.find("twitter.preferred.lang")
         )
-        self.parser = TweetParser()
         self.setSiteName(SourcesEnum.TWITTER)
         self.uri: str = "https://twitter.com"
         self.baseUri = self.uri
@@ -177,7 +177,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
         if self.settings.apiKeySecret == "" or self.settings.apiKeySecret is None:
             raise Exception("NEWSBOT_TWITTER_API_KEY_SECRET is missing a value")
 
-        #self.parser.driverStart()
+        self._parser._driver.start()
         allArticles: List[Articles] = list()
 
         # Authenicate with Twitter
@@ -210,7 +210,7 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 for i in articles:
                     allArticles.append(i)
 
-        self.parser._driver. .close()
+        self._parser._driver.close()
         return allArticles
 
     def getTweets(self, api: API, username: str = "", hashtag: str = "") -> List:
@@ -246,11 +246,11 @@ class TwitterWorkerService(SourcesBase, FirefoxDriverService, SourcesInterface):
                 continue
 
             
-            self.parser.start(tweet=tweet, sourceId=self.getActiveSourceID(), searchValue=searchValue)
-            if self.parser.exists is True:
+            self._parser.start(tweet=tweet, sourceId=self.getActiveSourceID(), searchValue=searchValue)
+            if self._parser.exists is True:
                 continue
 
-            _list.append(self.parser.article)
+            _list.append(self._parser.article)
 
         return _list
 
