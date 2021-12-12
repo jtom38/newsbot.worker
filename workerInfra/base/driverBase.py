@@ -8,9 +8,7 @@ from os import remove
 class DriverBase():
     _logger: LoggerInterface
     __driver__: WebDriver
-
-    def __init__(self) -> None:
-        self.uri: str = ''
+    uri: str
 
     def getContent(self) -> str:
         try:
