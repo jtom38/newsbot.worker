@@ -79,8 +79,11 @@ class TweetParser(SourceParseInterface, ParserBase):
 
     def getUrl(self) -> str:
         # a.url = f"https://twitter.com/{authorScreenName}/status/{tweet.id}"
-        name = self.__tweet__.author.screen_name
-        return f"https://twitter.com/{name}/status/{self.__tweet__.id}"
+        try:
+            name = self.__tweet__.author.screen_name
+            return f"https://twitter.com/{name}/status/{self.__tweet__.id}"
+        except Exception as e:
+            self._logger.error("Failed to generate tweet url.")
 
     def getThumbnail(self) -> str:
         try:
@@ -180,15 +183,7 @@ class TwitterWorkerService(SourcesBase, SourcesInterface):
         self._parser._driver.start()
         allArticles: List[Articles] = list()
 
-        # Authenicate with Twitter
-        appAuth = AppAuthHandler(consumer_key=self.settings.apiKey, consumer_secret=self.settings.apiKeySecret)
-
-        # auth to twitter
-        try:
-            api = API(appAuth)
-        except Exception as e:
-            self._logger.critical(f"Failed to authenicate with Twitter. Error: {e}")
-            return allArticles
+        api = self.login()
 
         for _site in self.__links__:
             site: Sources = _site
@@ -200,15 +195,18 @@ class TwitterWorkerService(SourcesBase, SourcesInterface):
             # Figure out if we are looking for a user or tag
             if site.type == "user":
                 tweets = self.getTweets(api=api, username=site.name)
+                if len(tweets) == 0:
+                    continue
                 articles = self.convertTweetsToArticles(tweets=tweets, searchValue=site.name, isHashtag=False)
-                for i in articles:
-                    allArticles.append(i)
 
             elif site.type == "tag":
                 tweets = self.getTweets(api=api, hashtag=site.name)
+                if len(tweets) == 0:
+                    continue
                 articles = self.convertTweetsToArticles(tweets=tweets, searchValue=site.name, isHashtag=True)
-                for i in articles:
-                    allArticles.append(i)
+
+            for i in articles:
+                allArticles.append(i)
 
         self._parser._driver.close()
         return allArticles
@@ -225,9 +223,18 @@ class TwitterWorkerService(SourcesBase, SourcesInterface):
                 for tweet in Cursor(api.search, q=f"#{hashtag}").items(15):
                     tweets.append(tweet)
         except Exception as e:
-            self._logger.error("{e}")
+            self._logger.error(f"{e}")
         finally:
             return tweets
+
+    def login(self) -> API:
+        appAuth = AppAuthHandler(consumer_key=self.settings.apiKey, consumer_secret=self.settings.apiKeySecret)
+        try:
+            api = API(appAuth)
+            return api
+        except Exception as e:
+            self._logger.critical(f"Failed to authenicate with Twitter. Error: {e}")
+            return list()
 
     def convertTweetsToArticles(self, tweets: List, searchValue: str, isHashtag: bool) -> List[Articles]:
         _list = list()
@@ -244,7 +251,6 @@ class TwitterWorkerService(SourcesBase, SourcesInterface):
             isRetweet = self.__isRetweet__(tweet)
             if isRetweet is True:
                 continue
-
             
             self._parser.start(tweet=tweet, sourceId=self.getActiveSourceID(), searchValue=searchValue)
             if self._parser.exists is True:
