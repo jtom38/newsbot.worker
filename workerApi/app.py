@@ -16,7 +16,7 @@ app.include_router(RedditRouter)
 
 _health = HealthCheckFactory()
 _health.add(HealthCheckUri(connectionUri='https://reddit.com/r/aww.json', alias='reddit', tags=('reddit', "uri")))
-app.add_api_route('/health', endpoint=healthCheckRoute(_health))
+app.add_api_route('/health', endpoint=healthCheckRoute(_health), include_in_schema=False)
 
 @app.on_event('startup')
 def startupEvent() -> None:

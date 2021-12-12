@@ -15,7 +15,7 @@ class FirefoxDriverService(DriverBase, DriverInterface):
     def __init__(self, logger: LoggerInterface) -> None:
         self._logger = logger
 
-    def driverStart(self) -> Firefox:
+    def start(self) -> Firefox:
         try:
             self._logger.debug("Driver is starting up Firefox")
             o = FirefoxOptions()

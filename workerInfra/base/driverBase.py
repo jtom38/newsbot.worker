@@ -8,9 +8,7 @@ from os import remove
 class DriverBase():
     _logger: LoggerInterface
     __driver__: WebDriver
-
-    def __init__(self) -> None:
-        self.uri: str = ''
+    uri: str
 
     def getContent(self) -> str:
         try:
@@ -29,11 +27,11 @@ class DriverBase():
         This helps to avoid extra calls/refreshes if they are not needed.
         """
         try:
-            if uri != self.driverGetUrl():
+            if uri != self.getUrl():
                 self._logger.debug(f"Requesting page: '{uri}'")
                 self.__driver__.get(uri)
                 sleep(5)
-                newUrl = self.driverGetUrl()
+                newUrl = self.getUrl()
                 if newUrl != uri:
                     self._logger.debug(f"Was redirected to '{newUrl}'!")
             # self.driver.implicitly_wait(10)
