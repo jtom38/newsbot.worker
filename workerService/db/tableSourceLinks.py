@@ -23,26 +23,26 @@ class SourceLinksTable(RestSql):
         return d
 
     def __fromApi__(self, item: dict) -> SourceLinks:
-        a= SourceLinks(
+        a = SourceLinks(
             sourceID=item['sourceID'],
             sourceName=item['sourceName'],
             sourceType=item['sourceType'],
             discordID=item['discordID'],
             discordName=item['discordName'],
         )
-        a.id=item['id']
+        a.id = item['id']
         return a
 
     def __singleFromApi__(self, raw: str) -> SourceLinks:
         d = loads(raw)
         return self.__fromApi__(d)
 
-    def __listFromApi__(self, raw:str) -> List[SourceLinks]:
+    def __listFromApi__(self, raw: str) -> List[SourceLinks]:
         d: List[dict] = loads(raw)
-        l = list()
+        _l = list()
         for i in d:
-            l.append(self.__fromApi__(i))
-        return l
+            _l.append(self.__fromApi__(i))
+        return _l
 
     def getAll(self) -> List[SourceLinks]:
         raw = get(url=f"{self.uri}/get/all")
@@ -54,13 +54,13 @@ class SourceLinksTable(RestSql):
         item = self.__singleFromApi__(raw.text)
         return item
 
-    def getAllBySourceName(self,name:str) -> List[SourceLinks]:
-        raw = get(url=f"{self.uri}/get/all/bySourceName", params={'name':name})
+    def getAllBySourceName(self, name: str) -> List[SourceLinks]:
+        raw = get(url=f"{self.uri}/get/all/bySourceName", params={'name': name})
         items: List[SourceLinks] = self.__listFromApi__(raw.text)
         return items
 
-    def getAllBySourceType(self,sourceType:str) -> List[SourceLinks]:
-        raw = get(url=f"{self.uri}/get/all/bySourceType", params={'sourceType':sourceType})
+    def getAllBySourceType(self, sourceType: str) -> List[SourceLinks]:
+        raw = get(url=f"{self.uri}/get/all/bySourceType", params={'sourceType': sourceType})
         items: List[SourceLinks] = self.__listFromApi__(raw.text)
         return items
 
@@ -71,7 +71,7 @@ class SourceLinksTable(RestSql):
 
     # def getAllBySourceNameAndSource(self,sourceName:str,source:str) -> List[SourceLinks]:
     #     return NotImplementedError()
-    #     raw = get(url=f"{self.uri}/get/all/bySourceNameAndType", 
+    #     raw = get(url=f"{self.uri}/get/all/bySourceNameAndType",
     #         params={'sourceName':sourceName, 'sourceType':sourceType}
     #     )
     #     if raw.status_code == 404:
@@ -87,31 +87,33 @@ class SourceLinksTable(RestSql):
     #             items: List[SourceLinks] = self.__listFromApi__(raw.text)
     #             return items
 
-    def getAllBySourceNameAndType(self,sourceName:str,sourceType:str) -> List[SourceLinks]:
-        raw = get(url=f"{self.uri}/get/all/bySourceNameAndType", 
-            params={'sourceName':sourceName, 'sourceType':sourceType}
+    def getAllBySourceNameAndType(self, sourceName: str, sourceType: str) -> List[SourceLinks]:
+        raw = get(
+            url=f"{self.uri}/get/all/bySourceNameAndType",
+            params={'sourceName': sourceName, 'sourceType': sourceType}
         )
         if raw.status_code == 404:
-            l = list()
-            l.append(SourceLinks())
-            return l
+            _l = list()
+            _l.append(SourceLinks())
+            return _l
         elif raw.status_code == 200:
             if raw.text == '[]':
-                l = list()
-                l.append(SourceLinks())
-                return l
+                _l = list()
+                _l.append(SourceLinks())
+                return _l
             else:
                 items: List[SourceLinks] = self.__listFromApi__(raw.text)
                 return items
 
-    def getBySourceNameAndSourceTypeAndDiscordName(self,sourceName:str,sourceType:str, discordName:str) -> SourceLinks:
-        raw = get(url=f"{self.uri}/get/bySourceNameAndSourceTypeAndDiscordName", 
-            params={'sourceName':sourceName, 'sourceType':sourceType, 'discordName': discordName}
+    def getBySourceNameAndSourceTypeAndDiscordName(self, sourceName: str, sourceType: str, discordName: str) -> SourceLinks:
+        raw = get(
+            url=f"{self.uri}/get/bySourceNameAndSourceTypeAndDiscordName",
+            params={'sourceName': sourceName, 'sourceType': sourceType, 'discordName': discordName}
         )
         if raw.status_code == 404:
-            l = list()
-            l.append(SourceLinks())
-            return l
+            _list = list()
+            _list.append(SourceLinks())
+            return _list
         elif raw.status_code == 200:
             if raw.text == 'null':
                 return SourceLinks()
@@ -119,8 +121,8 @@ class SourceLinksTable(RestSql):
                 items: SourceLinks = self.__singleFromApi__(raw.text)
                 return items
 
-    def getByDiscordId(self,name:str) -> SourceLinks:
-        raw = get(url=f"{self.uri}/get/byName", params={'name':name})
+    def getByDiscordId(self, name: str) -> SourceLinks:
+        raw = get(url=f"{self.uri}/get/byName", params={'name': name})
         if raw.status_code == 404:
             return SourceLinks()
         elif raw.status_code == 200:
@@ -159,8 +161,7 @@ class SourceLinksTable(RestSql):
 
     def updateById(self, id: str, item: SourceLinks) -> None:
         body = self.__toApi__(item)
-        post(url=f"{self.uri}/update/byId", json= body, params={'id':id})
+        post(url=f"{self.uri}/update/byId", json=body, params={'id': id})
 
     def delete(self, id: str) -> None:
         delete(url=f"{self.uri}/delete/byId", params={'id': id})
-

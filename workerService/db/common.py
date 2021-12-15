@@ -4,6 +4,7 @@ from os import getenv
 from workerInfra.exceptions import MissingApiUrl
 from workerInfra.domain import DbApiTableInterface
 
+
 class RestSql(DbApiTableInterface):
     def __getApiUri__(self) -> str:
         try:
@@ -11,7 +12,7 @@ class RestSql(DbApiTableInterface):
             if res is None:
                 raise MissingApiUrl
             return res
-        except MissingApiUrl as e:
+        except MissingApiUrl:
             print("Was unable to find a value against 'NEWSBOT_API_URI'.  Please make sure it has been added and try again.")
             exit(1)
 
@@ -19,12 +20,12 @@ class RestSql(DbApiTableInterface):
         d = loads(raw)
         return self.__fromApi__(d)
 
-    def __listFromApi__(self, raw:str) -> List[object]:
+    def __listFromApi__(self, raw: str) -> List[object]:
         d: List[dict] = loads(raw)
-        l = list()
+        _l = list()
         for i in d:
-            l.append(self.__fromApi__(i))
-        return l
+            _l.append(self.__fromApi__(i))
+        return _l
 
     def validateStatusCode(self, statusCode: int, text: str) -> bool:
         """
@@ -41,16 +42,16 @@ class RestSql(DbApiTableInterface):
 
     def convertListResults(self, statusCode: int, text: str) -> List[object]:
         isGood = self.validateStatusCode(statusCode, text)
-        if isGood == True:
+        if isGood is True:
             return self.__listFromApi__(text)
-        else: 
-            l = list()
-            l.append(self.__generateBlank__())
-            return l
+        else:
+            _l = list()
+            _l.append(self.__generateBlank__())
+            return _l
 
     def convertSingleResult(self, statusCode: int, text: str) -> object:
         isGood = self.validateStatusCode(statusCode, text)
-        if isGood == True:
+        if isGood is True:
             return self.__singleFromApi__(text)
-        else: 
+        else:
             return self.__generateBlank__()

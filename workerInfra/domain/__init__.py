@@ -1,5 +1,5 @@
 from .dbApiInterface import DbApiTableInterface
-from .dbApiTableInterface import DbApiTableInterface
+# from .dbApiTableInterface import DbApiTableInterface
 from .cacheInterface import CacheInterface
 from .outputInterface import OutputInterface
 from .outputFormatterInterface import OutputFormatterInterface

@@ -20,4 +20,3 @@ class OutputInterface(ABC):
     @abstractclassmethod
     def isSafeToRemove(self) -> bool:
         raise NotImplementedError
-

@@ -22,37 +22,37 @@ class SettingsTable(RestSql):
         return d
 
     def __fromApi__(self, item: dict) -> Settings:
-        a= Settings(
+        a = Settings(
             key=item['key'],
             value=item['value'],
             options=item['options'],
             notes=item['notes'],
         )
-        a.id=item['id']
+        a.id = item['id']
         return a
 
     def __singleFromApi__(self, raw: str) -> Settings:
         d = loads(raw)
         return self.__fromApi__(d)
 
-    def __listFromApi__(self, raw:str) -> List[Settings]:
+    def __listFromApi__(self, raw: str) -> List[Settings]:
         d: List[dict] = loads(raw)
-        l = list()
+        _l = list()
         for i in d:
-            l.append(self.__fromApi__(i))
-        return l
+            _l.append(self.__fromApi__(i))
+        return _l
 
     def getAll(self) -> List[Settings]:
         raw = get(url=f"{self.uri}/get/all")
         items: List[Settings] = self.__listFromApi__(raw.text)
         return items
 
-    def getByKey(self,key:str) -> Settings:
-        raw = get(url=f"{self.uri}/get/byKey", params={'key':key})
+    def getByKey(self, key: str) -> Settings:
+        raw = get(url=f"{self.uri}/get/byKey", params={'key': key})
         items: Settings = self.__singleFromApi__(raw.text)
         return items
 
-    def find(self, item:Settings) -> Settings:
+    def find(self, item: Settings) -> Settings:
         body = self.__toApi__(item)
         res = get(url=f"{self.uri}/find", json=body)
         if res.status_code == 404:
@@ -64,7 +64,7 @@ class SettingsTable(RestSql):
             else:
                 return Settings()
 
-    def update(self, item:Settings) -> None:
+    def update(self, item: Settings) -> None:
         res = self.find(item)
         if res.id == '':
             self.add(item)
@@ -85,4 +85,3 @@ class SettingsTable(RestSql):
 
     def delete(self, id: str) -> None:
         delete(url=f"{self.uri}/delete/byId", params={'id': id})
-

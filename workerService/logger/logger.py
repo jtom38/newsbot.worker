@@ -1,9 +1,8 @@
 import logging
 from string import Formatter
-
 from workerInfra.domain.loggerInterface import LoggerInterface
-#from workerInfra.enum.envEnum import EnvEnum
 from workerService.envReaderService import EnvReaderService
+
 
 def getFileHandler(level: int, formatter: Formatter) -> logging.Handler:
     f = logging.FileHandler('invmon.log')
@@ -48,5 +47,3 @@ class BasicLoggerService(LoggerInterface):
 
     def critical(self, message: str) -> None:
         print(f"CRITICAL: {message}")
-
-

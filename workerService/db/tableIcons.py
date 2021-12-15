@@ -19,11 +19,11 @@ class IconsTable(RestSql):
         return d
 
     def __fromApi__(self, item: dict) -> Icons:
-        a= Icons(
+        a = Icons(
             filename=item['filename'],
             site=item['site']
         )
-        a.id=item['id']
+        a.id = item['id']
         return a
 
     def __generateBlank__(self) -> Icons:
@@ -41,7 +41,7 @@ class IconsTable(RestSql):
         # items: List[Icons] = self.__singleFromApi__(raw.text)
         # return items
 
-    def find(self, item:Icons) -> Icons:
+    def find(self, item: Icons) -> Icons:
         body = self.__toApi__(item)
         res = get(url=f"{self.uri}/find", json=body)
         return self.convertSingleResult(res.status_code, res.text)
@@ -54,7 +54,7 @@ class IconsTable(RestSql):
         #    else:
         #        return Icons()
 
-    def update(self, item:Icons) -> None:
+    def update(self, item: Icons) -> None:
         res = self.find(item)
         if res.id == '':
             self.add(item)

@@ -29,7 +29,7 @@ class ArticlesTable(RestSql):
         return d
 
     def fromDict(self, item: Articles) -> Articles:
-        a= Articles(
+        a = Articles(
             sourceId=item['sourceId'],
             tags=item['tags'],
             title=item['title'],
@@ -68,12 +68,12 @@ class ArticlesTable(RestSql):
     def getByUrl(self, url: str) -> Articles:
         try:
             res = get(f"{self.uri}/get/byUrl", params={'url': url})
-        except Exception as e:
+        except Exception:
             print("Failed to get details from the API.")
-            
+
         return self.convertSingleResult(res.status_code, res.text)
 
-    def update(self, item:Articles) -> None:
+    def update(self, item: Articles) -> None:
         res = self.find(item)
         if res.id == '':
             self.add(item)
@@ -104,6 +104,5 @@ class ArticlesTable(RestSql):
         try:
             body = self.__toApi__(item)
             post(url=f"{self.uri}/add", json=body)
-        except:
+        except Exception:
             print("failed to add item to Articles.")
-

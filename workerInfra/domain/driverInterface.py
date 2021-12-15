@@ -25,4 +25,3 @@ class DriverInterface(ABC):
     @abstractclassmethod
     def close(self, displayMsg: bool = True) -> None:
         raise NotImplementedError()
-        

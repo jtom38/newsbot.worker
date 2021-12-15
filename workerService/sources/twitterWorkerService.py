@@ -83,7 +83,7 @@ class TweetParser(SourceParseInterface, ParserBase):
             name = self.__tweet__.author.screen_name
             return f"https://twitter.com/{name}/status/{self.__tweet__.id}"
         except Exception as e:
-            self._logger.error("Failed to generate tweet url.")
+            self._logger.error(f"Failed to generate tweet url. {e}")
 
     def getThumbnail(self) -> str:
         try:
@@ -251,7 +251,7 @@ class TwitterWorkerService(SourcesBase, SourcesInterface):
             isRetweet = self.__isRetweet__(tweet)
             if isRetweet is True:
                 continue
-            
+
             self._parser.start(tweet=tweet, sourceId=self.getActiveSourceID(), searchValue=searchValue)
             if self._parser.exists is True:
                 continue

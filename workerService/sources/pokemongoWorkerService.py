@@ -10,6 +10,7 @@ from requests import Response
 from bs4 import BeautifulSoup
 import re
 
+
 class PokemonGoWorkerService(SourcesBase, SourcesInterface):
     _logger: LoggerInterface
 
@@ -51,7 +52,7 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
                         item.thumbnail = self.getArticleThumbnail(item.url)
                         allArticles.append(item)
 
-                self._logger.debug(f"Pokemon Go Hub - Finished checking.")
+                self._logger.debug("Pokemon Go Hub - Finished checking.")
             except Exception as e:
                 self._logger.error(
                     f"Failed to parse articles from Pokemon Go Hub.  Chances are we have a malformed response. {e}"
@@ -72,7 +73,7 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
             elif i.name == "link":
                 a.url = self.removeHTMLTags(i.next)
             elif i.name == "pubdate":
-                #a.pubDate = i.next
+                # a.pubDate = i.next
                 pass
             elif i.name == "category":
                 a.tags += f", {i.next.lower()}"
@@ -83,7 +84,7 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
         return a
 
     def removeHTMLTags(self, text: str) -> str:
-        tags = ("<p>", "</p>", "<img >", "<h2>")
+        # tags = ("<p>", "</p>", "<img >", "<h2>")
         text = text.replace("\n", "")
         text = text.replace("\t", "")
         text = text.replace("<p>", "")
@@ -93,14 +94,13 @@ class PokemonGoWorkerService(SourcesBase, SourcesInterface):
         try:
             if len(spans) >= 1:
                 print("money")
-        except:
+        except Exception:
             pass
 
         return text
 
     def getArticleThumbnail(self, link: str) -> str:
         try:
-            #self.uri = link
             r = self.getContent(uri=link)
             bs: BeautifulSoup = BeautifulSoup(r.content, features="html.parser")
             res = bs.find_all("img", class_="entry-thumb")

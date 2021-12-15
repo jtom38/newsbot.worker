@@ -17,7 +17,7 @@ class TwitchAuth:
 
 
 class TwitchChannel:
-    ## might go away
+    # might go away
     def __init__(self, obj: Dict = {}):
         self.broadcaster_language: str = obj.get("broadcaster_language")
         self.display_name: str = obj.get("display_name")
@@ -87,8 +87,9 @@ class TwitchGameData:
         self.id = 0
         try:
             self.id = int(obj.get("id"))
-        except:
-            pass
+        except Exception as e:
+            print(f"TwitchGameData Error: {e}")
+            self.id = 0
 
         self.name: str = obj.get("name")
         self.box_art_url: str = obj.get("box_art_url")

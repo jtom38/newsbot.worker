@@ -15,9 +15,9 @@ class LoggerInterface(ABC):
         raise NotImplementedError()
 
     @abstractclassmethod
-    def error(self, message:str ) -> None:
+    def error(self, message: str) -> None:
         raise NotImplementedError()
 
     @abstractclassmethod
-    def critical(self,message:str) -> None:
+    def critical(self, message: str) -> None:
         raise NotImplementedError()
