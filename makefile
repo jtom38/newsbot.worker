@@ -8,7 +8,7 @@ test: ## Runs unit tests
 	pytest
 
 lint: ## Run flake8 against the project
-	flake8 --ignore E501,F401,F405 ./newsbot
+	flake8 --ignore E501,F401,F405 ./workerApi
 
 build: ## Build docker image
 	docker build -t newsbot-worker:latest .

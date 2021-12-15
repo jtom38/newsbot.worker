@@ -5,9 +5,10 @@ from workerInfra.models import SchedulerActveJobsModel
 
 
 router = APIRouter(
-    prefix='/scheduler'
-    ,tags=['Scheduler']
+    prefix='/scheduler',
+    tags=['Scheduler']
 )
+
 
 @router.get('/get/jobs')
 def getJobs() -> List[SchedulerActveJobsModel]:

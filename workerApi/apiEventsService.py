@@ -6,7 +6,7 @@ from workerService.scheduler import SchedulerService
 from workerService.logger import BasicLoggerService
 from workerService.outputs import DiscordOutputService
 from workerService.sources import (
-    WorkerService, 
+    WorkerService,
     RedditWorkerService,
     YoutubeWorkerService,
     TwitterWorkerService,
@@ -30,68 +30,68 @@ class ApiEventsService():
         pass
 
     def startup(self) -> None:
-        self._scheduler.addJob(self.enableSourceReddit())
-        self._scheduler.addJob(self.enableSourceYoutube())
-        self._scheduler.addJob(self.enableSourceTwitter())
-        self._scheduler.addJob(self.enableSourceTwitch())
-        self._scheduler.addJob(self.enableSourcePokemonGo())
-        self._scheduler.addJob(self.enableSourceFFXIV())
+        # self._scheduler.addJob(self.enableSourceReddit())
+        # self._scheduler.addJob(self.enableSourceYoutube())
+        # self._scheduler.addJob(self.enableSourceTwitter())
+        # self._scheduler.addJob(self.enableSourceTwitch())
+        # self._scheduler.addJob(self.enableSourcePokemonGo())
+        # self._scheduler.addJob(self.enableSourceFFXIV())
 
         self._scheduler.addJob(self.enableOutputDiscord())
 
         self._scheduler.start()
 
     def enableSourceReddit(self) -> SchedulerJobModel:
-        s = SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init,trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        s = SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.REDDITENABLED) == False:
+        if self._env.getValue(EnvEnum.REDDITENABLED) is False:
             s.enabled = False
         return s
 
     def enableSourceYoutube(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(YoutubeWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.YOUTUBEENABLED) == False:
+        if self._env.getValue(EnvEnum.YOUTUBEENABLED) is False:
             s.enabled = False
         return s
 
     def enableSourceTwitter(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(TwitterWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.TWITCHEANBLED) == False:
+        if self._env.getValue(EnvEnum.TWITCHEANBLED) is False:
             s.enabled = False
         return s
 
     def enableSourceTwitch(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(TwitchWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.TWITCHEANBLED) == False:
+        if self._env.getValue(EnvEnum.TWITCHEANBLED) is False:
             s.enabled = False
         return s
 
     def enableSourcePokemonGo(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(PokemonGoWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.POKEMONGOENABLED) == False:
+        if self._env.getValue(EnvEnum.POKEMONGOENABLED) is False:
             s.enabled = False
         return s
 
     def enableSourceFFXIV(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(FFXIVWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
-        if self._env.getValue(EnvEnum.FFXIVENABLED) == False:
+        if self._env.getValue(EnvEnum.FFXIVENABLED) is False:
             s.enabled = False
         return s
 
     def enableOutputDiscord(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=DiscordOutputService().init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=3)
-        if self._isDebug == True:
+        if self._isDebug is True:
             s.minutes = 1
         return s
 
