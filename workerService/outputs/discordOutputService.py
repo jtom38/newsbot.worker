@@ -18,7 +18,7 @@ class DiscordFormatter(ConvertHtml, OutputFormatterInterface):
     """
     This class is here to convert HTML to Discord formatting.
     """
-    
+
     def convertFromHtml(self, msg: str) -> str:
         msg = msg.replace("<h2>", "**")
         msg = msg.replace("</h2>", "**")
@@ -52,12 +52,12 @@ class DiscordFormatter(ConvertHtml, OutputFormatterInterface):
         # links = re.findall("(?<=<a )(.*)(?=</a>)", msg)
         msg = msg.replace("'", '"')
         links = re.findall("<a(.*?)a>", msg)
-        for l in links:
-            hrefs = re.findall('href="(.*?)"', l)
-            texts = re.findall(">(.*?)</", l)
+        for item in links:
+            hrefs = re.findall('href="(.*?)"', item)
+            texts = re.findall(">(.*?)</", item)
             if len(hrefs) >= 1 and len(texts) >= 1:
                 discordLink = f"[{texts[0]}]({hrefs[0]})"
-                msg = msg.replace(f"<a{l}a>", discordLink)
+                msg = msg.replace(f"<a{item}a>", discordLink)
         return msg
 
 
@@ -96,7 +96,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
                 self.buildMessage(self.article, self.source)
                 resp = self.sendMessage()
                 safeToRemove = self.isSafeToRemove(resp)
-                if safeToRemove == True:
+                if safeToRemove is True:
                     self.tableDiscordQueue.deleteById(i.id)
 
                 self.webhooks.clear()
@@ -127,13 +127,13 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         try:
             authorIcon = self.getAuthorIcon(
                 icon=article.authorImage,
-                name=source.name, 
+                name=source.name,
                 type=source.type,
                 source=source.source
-                )
+            )
 
             embed.set_author(name=article.authorName, url=None, icon_url=authorIcon)
-        except:
+        except Exception:
             pass
 
         # Discord Embed Description can only contain 2048 characters
@@ -171,7 +171,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         embed.add_embed_field(name="Link:", value=article.url)
 
         # Build our footer message
-        footer = self.buildFooter(source= source.source, name=source.name, _type=source.type)
+        footer = self.buildFooter(source=source.source, name=source.name, _type=source.type)
         footerIcon = self.getFooterIcon(siteName=source.name, sourceType=source.source)
         embed.set_footer(icon_url=footerIcon, text=footer)
 
@@ -217,7 +217,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         table = self.tableIcons
         if icon != "":
             return icon
-        
+
         # Pull the default icon
         res = table.getBySite(f"Default {source}")
         if res.id != '':
@@ -225,9 +225,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
 
         try:
             if (
-                type == SourcesEnum.FINALFANTASYXIV.value
-                or type == SourcesEnum.PHANTASYSTARONLINE2.value
-                or type == SourcesEnum.POKEMONGO.value
+                type == SourcesEnum.FINALFANTASYXIV.value or type == SourcesEnum.PHANTASYSTARONLINE2.value or type == SourcesEnum.POKEMONGO.value
             ):
                 res = table.getBySite(site=f"Default {type}")
 
@@ -237,7 +235,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
             return res.filename
 
         except Exception as e:
-            self._logger.error(f"Failed to find the author icon for type:{type} name:{name}")
+            self._logger.error(f"Failed to find the author icon for type:{type} name:{name} {e}")
 
     def buildFooter(self, source: str, name: str, _type: str = '') -> str:
         footer = ""
@@ -264,8 +262,8 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
             elif s[1] == "user":
                 footer = f"{s[2]} - {end}"
 
-        #elif SourceName.RSS.value in source:
-            #footer = f"{name} - {end}"
+        # elif SourceName.RSS.value in source:
+            # footer = f"{name} - {end}"
 
         else:
             footer = end
@@ -289,7 +287,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         # Decimal values can be collected from https://www.spycolor.com
         if SourcesEnum.REDDIT.value in sourceType:
             return 16395272
-        elif SourcesEnum.YOUTUBE.value  in sourceType:
+        elif SourcesEnum.YOUTUBE.value in sourceType:
             return 16449542
         elif SourcesEnum.INSTAGRAM.value in sourceType:
             return 13303930
@@ -304,8 +302,7 @@ class DiscordOutputService(OutputInterface, OutputBase, DiscordFormatter):
         elif SourcesEnum.TWITCH.value in sourceType:
             return 9718783
         elif SourcesEnum.RSS.value in sourceType:
-            #self.getRssEmbedColor(sourceName=sourceName)
+            # self.getRssEmbedColor(sourceName=sourceName)
             return 0
         else:
             return 0
-

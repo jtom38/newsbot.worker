@@ -25,4 +25,3 @@ class FirefoxDriverService(DriverBase, DriverInterface):
             return driver
         except Exception as e:
             self._logger.critical(f"Firefox driver failed to start: Error: {e}")
-

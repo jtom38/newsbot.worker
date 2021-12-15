@@ -6,6 +6,7 @@ from json import loads
 from typing import List, Dict
 from os import getenv
 
+
 class TwitchAPI:
     _logger = LoggerInterface
 
@@ -37,7 +38,7 @@ class TwitchAPI:
                     token_type=token["token_type"],
                     client_id=client_id,
                 )
-            except Exception as e:
+            except Exception:
                 raise Exception("Failed to auth with Twitch.  Make sure NEWSBOT_TWITCH_CLIENT_ID anf NEWSBOT_TWITCH_CLIENT_SECRET are defined.")
             return o
 
@@ -53,14 +54,14 @@ class TwitchAPI:
             if len(json["data"]) == 1:
                 user = TwitchUser(json["data"][0])
             else:
-                self._logger.error(f"Did not get a usable object.")
+                self._logger.error("Did not get a usable object.")
                 user = TwitchUser({})
             return user
 
     def searchForUser(self, auth: TwitchAuth, username: str = "") -> None:
         if username == "":
             self._logger.error(
-                f"Request to search for user was requested but no user was given."
+                "Request to search for user was requested but no user was given."
             )
         else:
             uri: str = f"{self.apiUri}/search/channels?query={username}"
@@ -71,7 +72,7 @@ class TwitchAPI:
                     f"Attempted to pull user information but failed. status_code: {res.status_code}, output: {res.text}"
                 )
             else:
-                l = list()
+                _l = list()
                 j = loads(res.content)
                 for i in j["data"]:
                     # Convert the Json date to an object
@@ -79,8 +80,8 @@ class TwitchAPI:
                     # Get the game details
                     # stream.game_data = self.getGame(auth,stream.game_id)
                     # video = self.getVideos(auth=auth, user_id=stream.id)
-                    l.append(stream)
-                return l
+                    _l.append(stream)
+                return _l
 
     def getGame(self, auth: TwitchAuth, game_id: int) -> TwitchGameData:
         uri = f"{self.apiUri}/games?id={game_id}"
@@ -114,7 +115,7 @@ class TwitchAPI:
         res = get(uri, headers=self.__header__(auth))
         videos = list()
         if res.status_code != 200:
-            self._logger.error(f"Failed to request videos")
+            self._logger.error("Failed to request videos")
             return videos
         else:
             json = loads(res.content)
@@ -134,7 +135,7 @@ class TwitchAPI:
             uri = f"{uri}?game_id={game_id}"
         else:
             self._logger.error(
-                f"Clips was requested but was given invalid parameters, returning empty object."
+                "Clips was requested but was given invalid parameters, returning empty object."
             )
             return ""
 
@@ -186,4 +187,3 @@ class TwitchAPI:
             "Authorization": f"Bearer {auth.access_token}",
             "Client-ID": f"{auth.client_id}",
         }
-

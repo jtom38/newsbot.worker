@@ -25,15 +25,15 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
         self.uri = "https://reddit.com/r/aww/top.json"
         self.setSiteName(SourcesEnum.REDDIT)
         self.config = EnvRedditConfig(
-            allowNsfw= bool(self._cache.findBool(key="reddit.allow.nsfw")),
-            pullTop= bool(self._cache.findBool("reddit.pull.top")),
-            pullHot= bool(self._cache.findBool("reddit.pull.hot"))
+            allowNsfw=bool(self._cache.findBool(key="reddit.allow.nsfw")),
+            pullTop=bool(self._cache.findBool("reddit.pull.top")),
+            pullHot=bool(self._cache.findBool("reddit.pull.hot"))
         )
 
     def getArticles(self) -> List[Articles]:
         allArticles: List[Articles] = list()
         for source in self.__links__:
-            self.setActiveSource(SourcesEnum.REDDIT, name = source.name)
+            self.setActiveSource(SourcesEnum.REDDIT, name=source.name)
             subreddit = source.name
             self._logger.debug(f"Collecting posts for '/r/{subreddit}'...")
 
@@ -48,14 +48,14 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
             # Now check the RSS/json
             posts = self.getPosts(subreddit)
             for p in posts:
-                #exists = self.articlesTable.getByUrl(url=f"https://reddit.com{p['data']['permalink']}")
-                #if exists.id == '':
-                
+                # exists = self.articlesTable.getByUrl(url=f"https://reddit.com{p['data']['permalink']}")
+                # if exists.id == '':
+
                 # Checking if NFSW posts can be sent
-                if p['data']['over_18'] == True and self.config.allowNsfw == False:
+                if p['data']['over_18'] is True and self.config.allowNsfw is False:
                     continue
 
-                post = self.getPostDetails(p["data"], authorName, authorImage )
+                post = self.getPostDetails(p["data"], authorName, authorImage)
                 allArticles.append(post)
 
             sleep(5.0)
@@ -86,8 +86,6 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
 
     def findSubThumbnail(self, soup: BeautifulSoup) -> str:
         authorImage: str = ""
-
-        #Find the 
         subImages = soup.find_all(name="img", attrs={"class": "Mh_Wl6YioFfBc9O1SQ4Jp"})
 
         if len(subImages) != 0:
@@ -95,7 +93,7 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
             authorImage = subImages[0].attrs["src"]
 
         if authorImage == "":
-            # I am not sure how to deal with svg images at this time.  
+            # I am not sure how to deal with svg images at this time.
             # Going to throw in the default reddit icon.
             subImages = soup.find_all(
                 name="svg", attrs={"class": "ixfotyd9YXZz0LNAtJ25N"}
@@ -107,7 +105,7 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
     def findTagline(self, soup: BeautifulSoup) -> str:
         tagLine: str = ''
         try:
-            subName = soup.find_all(name="h1", attrs={"class": "_2yYPPW47QxD4lFQTKpfpLQ"} )
+            subName = soup.find_all(name="h1", attrs={"class": "_2yYPPW47QxD4lFQTKpfpLQ"})
             tagLine = subName[0].text
             assert subName[0].text
         except Exception as e:
@@ -117,7 +115,7 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
     def getVideoThumbnail(self, preview) -> str:
         try:
             return preview["images"][0]["source"]["url"]
-        except:
+        except Exception:
             return ""
 
     def getPosts(self, subreddit: str) -> List[dict]:
@@ -128,14 +126,14 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
             raise Exception("Unable to collect posts from an unknown subreddit.  Please define the subreddit to collect form.")
         rootUri = f"https://reddit.com/r/{subreddit}"
 
-        if self.config.pullHot == False and self.config.pullTop == False:
+        if self.config.pullHot is False and self.config.pullTop is False:
             self.settingPullTop = True
 
         jsonUrl: str = ''
-        if self.config.pullHot == True:
+        if self.config.pullHot is True:
             jsonUrl = f"{rootUri}.json"
 
-        if self.config.pullTop == True:
+        if self.config.pullTop is True:
             jsonUrl = f"{rootUri}/top.json"
 
         self._logger.debug(f"Collecting posts from {jsonUrl}")
@@ -148,7 +146,7 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
                 self._logger.critical(f"Was able to reach out to '{jsonUrl}' but it returned less or no posts!")
             else:
                 return items
-        except:
+        except Exception:
             raise Exception(f"Failed to connect to {jsonUrl}.")
 
     def getPostDetails(self, obj: dict, authorName: str, authorImage: str) -> Articles:
@@ -163,13 +161,13 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
             )
 
             # figure out what url we are going to display
-            if obj["is_video"] == True:
+            if obj["is_video"] is True:
                 a.video = obj["media"]["reddit_video"]["fallback_url"]
                 a.videoHeight = obj["media"]["reddit_video"]["height"]
                 a.videoWidth = obj["media"]["reddit_video"]["width"]
                 a.thumbnail = self.getVideoThumbnail(obj["preview"])
 
-            elif obj["media_only"] == True:
+            elif obj["media_only"] is True:
                 self._logger.warning(f"Found 'media_only' object. url: {a.url}")
             elif "gallery" in obj["url"]:
                 self.uri = obj["url"]
@@ -185,7 +183,7 @@ class RedditWorkerService(SourcesBase, SourcesInterface):
                     a.thumbnail = pictures
                 except Exception as e:
                     self._logger.error(
-                        f"Failed to find the images on a reddit gallery.  CSS might have changed."
+                        f"Failed to find the images on a reddit gallery.  CSS might have changed. {e}"
                     )
             else:
                 a.thumbnail = obj["url"]

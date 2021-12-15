@@ -40,7 +40,7 @@ class YoutubeWorkerService(SourcesBase, SourcesInterface):
             # pull the source code from the main youtube page
             channelID = self.cache.find(key=f"{site.source}.{site.name}.channelID")
             if channelID == "":
-                #self._driverSession = self._driver.driverStart()
+                # self._driverSession = self._driver.driverStart()
                 self._driver.start()
                 self._driver.goTo(site.url)
                 if self.settingDebugScreenshots is True:

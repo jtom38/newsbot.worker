@@ -60,7 +60,7 @@ class CacheValidation():
 class SqlCache(CacheInterface):
     """
     This is an implementation of basic cashing with sql.
-    Do not use this class directly.  
+    Do not use this class directly.
     Always use Cache class and it will find the data as needed.
     """
 

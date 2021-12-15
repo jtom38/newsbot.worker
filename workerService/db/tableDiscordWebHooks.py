@@ -27,8 +27,8 @@ class DiscordWebHooksTable(RestSql):
         return d
 
     def __fromApi__(self, item: dict) -> DiscordWebHooks:
-        a= DiscordWebHooks(
-            name=item['name'], 
+        a = DiscordWebHooks(
+            name=item['name'],
             key=item['key'],
             server=item['server'],
             channel=item['channel'],
@@ -63,11 +63,11 @@ class DiscordWebHooksTable(RestSql):
         return self.convertSingleResult(raw.status_code, raw.text)
 
     def find(self, item: DiscordWebHooks) -> DiscordWebHooks:
-        body = self.__toApi__(item) 
+        body = self.__toApi__(item)
         res = get(url=f"{self.uri}/find", json=body)
         return self.convertSingleResult(res.status_code, res.text)
 
-    def update(self, item:DiscordWebHooks) -> DiscordWebHooks:
+    def update(self, item: DiscordWebHooks) -> DiscordWebHooks:
         res = self.find(item)
         if res.id == '':
             self.add(item)
@@ -89,4 +89,4 @@ class DiscordWebHooksTable(RestSql):
 
     def updateByID(self, id: str, item: DiscordWebHooks) -> None:
         body = self.__toApi__(item)
-        post(url=f"{self.uri}/update/byId", json= body, params={'id':id})
+        post(url=f"{self.uri}/update/byId", json=body, params={'id': id})

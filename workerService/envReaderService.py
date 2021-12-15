@@ -7,14 +7,14 @@ class EnvBase():
     def __validateBool__(self, msg: str) -> bool:
         if msg.lower() == 'true':
             return True
-        else: 
+        else:
             return False
 
     def __isOptional__(self, isOptional: bool, value: str) -> None:
-        if isOptional == True:
+        if isOptional is True:
             return None
 
-        if value == '' or value == None:
+        if value == '' or value is None:
             raise Exception(f"'{self.getKey()}' was expected, but not found.  Enter a value and try again.")
 
     def __validateString__(self, value: str) -> str:
@@ -40,14 +40,14 @@ class EnvReaderService():
     def getValue(self, key: EnvEnum, required: bool = False) -> str:
         try:
             res = environ[key.value]
-        except:
+        except Exception:
             res = ''
 
-        if required == True:
+        if required is True:
             if res == '':
                 raise Exception("No value was returned from the env.")
 
-        if res.isnumeric() == True:
+        if res.isnumeric() is True:
             return int(res)
         if res.lower() == 'true':
             return True

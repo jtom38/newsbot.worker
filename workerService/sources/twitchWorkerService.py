@@ -14,11 +14,11 @@ class TwitchWorkerService(SourcesBase, SourcesInterface):
         self.logger = BasicLoggerService()
         self.cache = Cache()
         self.settings = EnvTwitchConfig(
-            clientId=''
-            ,clientSecret=''
-            ,monitorClips= self.cache.findBool(key="twitch.clips.enabled")
-            ,monitorLiveStreams=False
-            ,monitorVod= self.cache.findBool(key="twitch.vod.enable")
+            clientId='',
+            clientSecret='',
+            monitorClips=self.cache.findBool(key="twitch.clips.enabled"),
+            monitorLiveStreams=False,
+            monitorVod=self.cache.findBool(key="twitch.vod.enable")
 
         )
         self.setSiteName(SourcesEnum.TWITCH)

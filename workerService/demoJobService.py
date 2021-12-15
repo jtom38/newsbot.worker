@@ -1,5 +1,6 @@
 from workerService.logger import Logger
 
+
 class DemoJobService():
     def __init__(self) -> None:
         self.logger = Logger(__class__)

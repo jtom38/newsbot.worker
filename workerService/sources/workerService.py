@@ -40,9 +40,9 @@ class WorkerService():
             news = self.source.getArticles()
             # Check the DB if it has been posted
             for i in news:
-                #self.processArticle(i)
+                # self.processArticle(i)
                 article = self.__addArticleRecord__(i)
-                if article == None:
+                if article is None:
                     continue
 
                 self.__addDiscordRecord__(article)
@@ -50,14 +50,13 @@ class WorkerService():
         except Exception as e:
             self.logger.warning(f"Failed to collect items from {self.source.siteName}.  Going to attempt again later on. {e}")
 
-
     def __addArticleRecord__(self, item: Articles) -> Articles:
         table = ArticlesTable()
-        
+
         res = table.getByUrl(item.url)
         if res.id != '':
             return None
-        
+
         # The article has not been posted, add it
         table.add(item)
         res = table.getByUrl(item.url)
