@@ -1,6 +1,7 @@
 from typing import List
 from dataclasses import dataclass
 
+
 @dataclass
 class EnvDiscordDetails:
     name: str
@@ -23,6 +24,7 @@ class EnvRssDetails:
 class EnvYoutubeConfig:
     debugScreenshots: bool
 
+
 @dataclass
 class EnvYoutubeDetails:
     """
@@ -44,7 +46,7 @@ class EnvRedditConfig:
 class EnvRedditDetails:
     subreddit: str
     discordLinkName: List[str]
-    
+
 
 @dataclass
 class EnvTwitchConfig:
@@ -59,12 +61,12 @@ class EnvTwitchConfig:
 class EnvTwitchDetails:
     user: str
     discordLinkName: str
-    
+
 
 @dataclass
 class EnvTwitterConfig:
     """
-    This is a collection object.  
+    This is a collection object.
     To get access to this, call Env().twitter_config
     """
     apiKey: str
@@ -87,11 +89,11 @@ class EnvInstagramDetails:
     discordLinkName: List[str]
 
 
-@dataclass
-class EnvInstagramDetails:
-    name: str
-    type: str
-    discordLinkName: List[str]
+# @dataclass
+# class EnvInstagramDetails:
+#    name: str
+#    type: str
+#    discordLinkName: List[str]
 
 
 @dataclass
@@ -114,6 +116,7 @@ class EnvFinalFantasyXIVDetails:
     maintenanceEnabled: bool = False
     updateEnabled: bool = False
     statusEnabled: bool = False
+
 
 @dataclass
 class EnvLogger():

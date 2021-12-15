@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 from workerInfra.enum import SourceTypeEnum
 
+
 @dataclass
 class Articles():
     sourceId: Optional[str]
@@ -44,7 +45,8 @@ class Articles():
             dt = date.today()
             today = f"{dt.year}-{dt.month}-{dt.day}"
             self.pubDate = today
-        else: self.pubDate = pubDate
+        else:
+            self.pubDate = pubDate
         self.video = video
         self.videoHeight = videoHeight
         self.videoWidth = videoWidth
@@ -59,7 +61,8 @@ class Articles():
             dt = date.today()
             today = f"{dt.year}-{dt.month}-{dt.day}"
             self.pubDate = today
-        else: self.pubDate = value
+        else:
+            self.pubDate = value
 
 
 @dataclass
@@ -72,6 +75,7 @@ class DiscordQueue():
         i = DiscordQueue()
         i.articleId = item.id
         return i
+
 
 class DiscordWebHooks():
     name: Optional[str]
@@ -96,9 +100,9 @@ class DiscordWebHooks():
         self.id = ''
         self.server = server
         self.channel = channel
-        if name == "":  
+        if name == "":
             self.name = self.__generateName__(server, channel)
-        else: 
+        else:
             self.name = name
         self.key = key
         self.url = url
@@ -107,6 +111,7 @@ class DiscordWebHooks():
 
     def __generateName__(self, server: str, channel: str) -> str:
         return f"{server} - {channel}"
+
 
 @dataclass
 class Icons():
@@ -123,7 +128,7 @@ class Settings():
     notes: str = ''
     id: Optional[str] = ''
 
-    
+
 @dataclass
 class SourceLinks():
     id: Optional[str] = ''
@@ -131,7 +136,7 @@ class SourceLinks():
     sourceName: str = ''
     sourceType: str = ''
     discordName: str = ''
-    discordID: str =''
+    discordID: str = ''
 
 
 @dataclass
@@ -146,4 +151,3 @@ class Sources():
     fromEnv: bool = False
     type: SourceTypeEnum = SourceTypeEnum.INVALID
     value: str = ''
-    

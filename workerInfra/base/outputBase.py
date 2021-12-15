@@ -4,6 +4,7 @@ from workerInfra.enum import SourcesEnum
 from workerInfra.exceptions import DiscordWebHookNotFound
 from workerService.db import DiscordQueueTable, ArticlesTable, SourcesTable, SourceLinksTable, DiscordWebHooksTable, IconsTable
 
+
 class ConvertHtml:
     """
     This class is used on outputs to clean up HTML code and replce objects with native formatting.
@@ -33,6 +34,7 @@ class ConvertHtml:
             msg = msg.replace(replace, replaceWith)
         return msg
 
+
 class OutputBase():
     """
     This class contains some of the common logic that can be used by other outputs.
@@ -51,7 +53,7 @@ class OutputBase():
             self.logger.warning(f"{source} is missing a name!")
 
         if source == '':
-            self.logger.warning(f"A null source name was given!")
+            self.logger.warning("A null source name was given!")
 
         hooks = list()
         table = self.tableSourceLinks
@@ -63,15 +65,15 @@ class OutputBase():
                 dbHooks = table.getAllBySourceType(sourceType=source)
 
             elif source == SourcesEnum.FINALFANTASYXIV.value:
-                dbHooks = table.getAllBySourceNameAndType(sourceName=name, sourceType=source )
-                #dbHooks = table.__filterDupes__(dbHooks)
-            
+                dbHooks = table.getAllBySourceNameAndType(sourceName=name, sourceType=source)
+                # dbHooks = table.__filterDupes__(dbHooks)
+
             elif SourcesEnum.TWITTER.value in source:
                 dbHooks = table.getAllBySourceNameAndType(sourceType=SourcesEnum.TWITTER.value, sourceName=name)
 
             else:
                 dbHooks = table.getAllBySourceNameAndType(sourceName=name, sourceType=source)
-            
+
             for hook in dbHooks:
                 item = self.tableDiscordWebHooks.getById(hook.discordID)
                 if item.url == "":
@@ -80,5 +82,4 @@ class OutputBase():
                 hooks.append(item.url)
             return hooks
         except DiscordWebHookNotFound as e:
-            self.logger.critical(f"Unable to find DiscordWebhook for {source} {name}")
-
+            self.logger.critical(f"Unable to find DiscordWebhook for {source} {name}. {e}")

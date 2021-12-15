@@ -8,7 +8,7 @@ class DbApiTableInterface(ABC):
         raise NotImplementedError()
 
     @abstractclassmethod
-    def __toApi__(self, item:object) -> dict:
+    def __toApi__(self, item: object) -> dict:
         raise NotImplementedError()
 
     @abstractclassmethod

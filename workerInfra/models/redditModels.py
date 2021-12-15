@@ -39,17 +39,17 @@ class RedditPostMedia():
 
 class RedditPost():
     """
-    This contains a subset of all the properties that can be found in the Reddit Json.  
+    This contains a subset of all the properties that can be found in the Reddit Json.
     """
     subreddit: str
-    #subreddit_id: str
+    # subreddit_id: str
     selftext: str
     author: str
-    #saved: bool
+    # saved: bool
     title: str
-    nsfw: bool 
-    #locked: bool
-    #numberOfComments: int
+    nsfw: bool
+    # locked: bool
+    # numberOfComments: int
     permalink: str
     thumbnail: str
     preview: List[RedditPostPreview]
@@ -74,9 +74,9 @@ class RedditPost():
             self.media = self.__convertPreview__(data['media'])
 
     def __convertPreview__(self, preview: dict) -> List[RedditPostPreview]:
-        l = list()
+        _previewList = list()
         if len(preview) == 0:
-            return l
+            return _previewList
 
         try:
             for i in preview:
@@ -85,12 +85,12 @@ class RedditPost():
                 p.imageHeight = i['source']['height']
                 p.imageWidth = i['source']['width']
                 p.imageUrl = i['source']['url']
-                l.append(p)
+                _previewList.append(p)
 
-            return l
-        except:
-            pass
-        
+            return _previewList
+        except Exception as e:
+            print(f"Failed to convert Reddit Post Preview. {e}")
+
     def __convertPreviewImages__(self):
         pass
 
@@ -108,5 +108,5 @@ class RedditPost():
             r.reddit_video.width = m['width']
             r.reddit_video.transcodingStatus = m['transcoding_status']
             return r
-        except:
-            pass
+        except Exception as e:
+            print(f"Failed to access media['reddit_video'], might not be on the object. {e}")
