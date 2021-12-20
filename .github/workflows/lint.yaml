@@ -19,10 +19,4 @@ jobs:
         run: pip install flake8
 
       - name: flake8 API
-        run: flake8 --ignore E501,F401,F405 ./workerApi
-
-      - name: flake8 Infra
-        run: flake8 --ignore E501,F401,F405 ./workerInfra
-
-      - name: flake8 Service
-        run: flake8 --ignore E501,F401,F405 ./workerService
+        run: flake8 --ignore E501,F401,F405 ./workerApi ./workerInfra ./workerService
