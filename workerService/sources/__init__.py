@@ -5,3 +5,4 @@ from .twitterWorkerService import TwitterWorkerService
 from .twitchWorkerService import TwitchWorkerService
 from .pokemongoWorkerService import PokemonGoWorkerService
 from .ffxivWorkerService import FFXIVWorkerService
+from .rssWorkerService import RssWorkerService
