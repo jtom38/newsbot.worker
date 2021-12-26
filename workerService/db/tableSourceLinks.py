@@ -11,6 +11,9 @@ class SourceLinksTable(RestSql):
         self.baseUrl = self.__getApiUri__()
         self.uri: str = f"{self.baseUrl}/v1/sourcelinks"
 
+    def __generateBlank__(self) -> object:
+        return SourceLinks(id='', sourceName='', sourceID='', sourceType='', discordID='', discordName='')
+
     def __toApi__(self, item: SourceLinks) -> dict:
         d = {
             'id': item.id,
@@ -34,8 +37,12 @@ class SourceLinksTable(RestSql):
         return a
 
     def __singleFromApi__(self, raw: str) -> SourceLinks:
-        d = loads(raw)
-        return self.__fromApi__(d)
+        try:
+            d = loads(raw)
+            return self.__fromApi__(d)
+        except Exception:
+            return self.__generateBlank__()
+            
 
     def __listFromApi__(self, raw: str) -> List[SourceLinks]:
         d: List[dict] = loads(raw)
