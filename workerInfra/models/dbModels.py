@@ -115,8 +115,8 @@ class DiscordWebHooks():
 
 @dataclass
 class Icons():
-    filename: str
-    site: str
+    filename: str = ''
+    site: str = ''
     id: str = ''
 
 

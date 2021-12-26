@@ -14,6 +14,7 @@ class SourceValidator():
     """
     This class validates the variables configured for the source to ensure that things are in place as expected.
     """
+    _logger: LoggerInterface
 
     def __startValidation__(self) -> None:
         self.__validateSiteName__()
@@ -54,7 +55,9 @@ class SourceValidator():
         for i in s:
             sl: SourceLinks = SourceLinksTable().getBySourceId(i.id)
             if sl.id == '':
-                raise MissingSourceID(f"Went looking for a source record on {siteName}, but id was missing.")
+                # self._logger.warning(message=f"Went looking for a source record on {siteName}, but id was missing.")
+                pass
+
             elif sl.discordID != "" or sl.discordID is not None:
                 discordRef = DiscordWebHooksTable().getById(id=sl.discordID)
                 if discordRef.enabled is True:
@@ -135,4 +138,5 @@ class SourcesBase(SourceValidator):
             self._logger.critical(f"failed to parse data returned from requests. {e}")
 
     def getHeaders(self) -> dict:
-        return {"User-Agent": "NewsBot - Automated News Delivery"}
+        # return {"User-Agent": "NewsBot - Automated News Delivery"}
+        return {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/91.3"}
