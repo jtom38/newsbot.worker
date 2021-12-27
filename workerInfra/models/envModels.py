@@ -89,13 +89,6 @@ class EnvInstagramDetails:
     discordLinkName: List[str]
 
 
-# @dataclass
-# class EnvInstagramDetails:
-#    name: str
-#    type: str
-#    discordLinkName: List[str]
-
-
 @dataclass
 class EnvPokemonGoDetails:
     enabled: bool

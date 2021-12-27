@@ -8,3 +8,5 @@ from .envReaderInterface import EnvReaderInterface
 from .sourcesInterface import SourcesInterface
 from .driverInterface import DriverInterface
 from .sourceParseInterface import SourceParseInterface
+from .rssFeedInterface import RssFeedInterface
+from .rssHelperInterface import RssHelperInterface
