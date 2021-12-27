@@ -33,13 +33,13 @@ class RequestContent:
         self.soup = soup
 
     def __getHeaders__(self) -> dict:
-        #return {"User-Agent": "NewsBot - Automated News Delivery"}
+        # return {"User-Agent": "NewsBot - Automated News Delivery"}
         return {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/91.3"}
 
     def __getSource__(self) -> str:
         try:
             res: Response = get(self.url, headers=self.__getHeaders__())
-            if res.ok == True:
+            if res.ok is True:
                 self.__response__: Response = res
                 return res.text
             else:
@@ -76,7 +76,8 @@ class RequestContent:
                 self.__soup__ = self.__getSoup__()
             else:
                 pass
-        except:
+        except Exception as e:
+            self._logger.warning(e)
             self.__soup__ = self.__getSoup__()
 
         pass
@@ -110,11 +111,11 @@ class RequestContent:
             name="link", attrKey="type", attrValue="application/json"
         )
 
-        if atom != None:
+        if atom is not None:
             return self.__buildFeedDict__("atom", atom.attrs["href"])
-        elif rss != None:
+        elif rss is not None:
             return self.__buildFeedDict__("rss", rss.attrs["href"])
-        elif json != None:
+        elif json is not None:
             return self.__buildFeedDict__("json", json.attrs["href"])
         else:
             return self.__buildFeedDict__("none", None)
@@ -129,7 +130,7 @@ class RequestContent:
         return: str
         """
         # if a site url contains the / lets remove it
-        if siteUrl.endswith("/") == True:
+        if siteUrl.endswith("/") is True:
             siteUrl = siteUrl.strip("/")
 
         bestSize: int = -1
@@ -171,7 +172,8 @@ class RequestContent:
                 if item.attrs["content"] != "":
                     thumb = item.attrs["content"]
                     return thumb
-            except:
+            except Exception as e:
+                self._logger.warning(e)
                 pass
         return ""
 
@@ -182,9 +184,9 @@ class RequestContent:
             {"name": "div", "key": "class", "value": "article-content post-page"},
         )
 
-        for l in lookups:
+        for lookup in lookups:
             content = self.findSingle(
-                name=l["name"], attrKey=l["key"], attrValue=l["value"]
+                name=lookup["name"], attrKey=lookup["key"], attrValue=lookup["value"]
             )
             if content.text != "":
                 return content.text
@@ -202,23 +204,22 @@ class RequestSiteContent(RequestContent):
             name="link", attrKey="type", attrValue="application/json"
         )
 
-        if atom != None:
+        if atom is not None:
             href = self.__cleanUrl__(atom.attrs["href"], siteUrl)
             return self.__buildFeedDict__("atom", href)
-        elif rss != None:
+        elif rss is not None:
             href = self.__cleanUrl__(rss.attrs["href"], siteUrl)
             return self.__buildFeedDict__("rss", href)
-        elif json != None:
+        elif json is not None:
             href = self.__cleanUrl__(json.attrs["href"], siteUrl)
             return self.__buildFeedDict__("json", href)
         elif "feedburner.com" in siteUrl:
             return self.__buildFeedDict__("feedburner", siteUrl)
-        
         else:
             return self.__buildFeedDict__("none", None)
 
     def __cleanUrl__(self, href: str, siteUrl: str) -> str:
-        if href.startswith("//") == True:
+        if href.startswith("//") is True:
             href = href.replace("//", "")
         if "http://" in href or "https://" in href:
             return href
@@ -237,7 +238,7 @@ class RequestSiteContent(RequestContent):
         return: str
         """
         # if a site url contains the / lets remove it
-        if siteUrl.endswith("/") == True:
+        if siteUrl.endswith("/") is True:
             siteUrl = siteUrl.strip("/")
 
         href = ""
@@ -269,9 +270,9 @@ class RequestSiteContent(RequestContent):
                         size: int = int(icon.attrs["sizes"].split("x")[0])
                         if size > bestSize:
                             bestSize = size
-                    except:
+                    except Exception as e:
                         self._logger.warning(
-                            f"'{siteUrl}' did not have sizes present on the site icon.  Not the standard use of the apple-touch-icon."
+                            f"'{siteUrl}' did not have sizes present on the site icon.  Not the standard use of the apple-touch-icon. {e}"
                         )
                         pass
 
@@ -294,8 +295,8 @@ class RequestSiteContent(RequestContent):
         largest: dict = {"size": 0, "url": ""}
         try:
             icons = self.findMany(name="link", attrKey="type", attrValue="image/png")
-        except:
-            self._logger.warning("Failed to find generic site icon links.")
+        except Exception as e:
+            self._logger.warning(f"Failed to find generic site icon links. {e}")
             return ""
 
         try:
@@ -304,8 +305,8 @@ class RequestSiteContent(RequestContent):
                 if t >= largest["size"]:
                     largest["size"] = t
                     largest["url"] = icon.attrs["href"]
-        except:
-            self._logger.warning("Failed to parse the generic site icon size.")
+        except Exception as e:
+            self._logger.warning(f"Failed to parse the generic site icon size. {e}")
             return ""
 
         return largest["url"]
@@ -332,7 +333,8 @@ class RequestArticleContent(RequestContent):
                 if item.attrs["content"] != "":
                     thumb = item.attrs["content"]
                     return thumb
-            except:
+            except Exception as e:
+                self._logger.warning(e)
                 pass
         return ""
 
@@ -355,10 +357,10 @@ class RequestArticleContent(RequestContent):
             },  # ArsTechnica
         )
 
-        for l in lookups:
+        for lookup in lookups:
             try:
                 content = self.findSingle(
-                    name=l["name"], attrKey=l["key"], attrValue=l["value"]
+                    name=lookup["name"], attrKey=lookup["key"], attrValue=lookup["value"]
                 )
                 if content.text != "":
                     text = ""
@@ -368,6 +370,7 @@ class RequestArticleContent(RequestContent):
                         for p in pBlocks:
                             text += f"{p} \r\n"
                     return content.text
-            except:
+            except Exception as e:
+                self._logger.warning(e)
                 pass
         return ""

@@ -14,6 +14,7 @@ from workerService.sources import (
     PokemonGoWorkerService,
     FFXIVWorkerService
 )
+from workerService.sources.rssWorkerService import RssWorkerService
 
 
 class ApiEventsService():
@@ -36,10 +37,19 @@ class ApiEventsService():
         # self._scheduler.addJob(self.enableSourceTwitch())
         # self._scheduler.addJob(self.enableSourcePokemonGo())
         # self._scheduler.addJob(self.enableSourceFFXIV())
+        # self._scheduler.addJob(self.enableSourceRss())
 
         self._scheduler.addJob(self.enableOutputDiscord())
 
         self._scheduler.start()
+
+    def enableSourceRss(self) -> SchedulerJobModel:
+        s = SchedulerJobModel(functionName=WorkerService(RssWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)
+        if self._isDebug is True:
+            s.minutes = 1
+        if self._env.getValue(EnvEnum.RSSENABLED) is False:
+            s.enabled = False
+        return s
 
     def enableSourceReddit(self) -> SchedulerJobModel:
         s = SchedulerJobModel(functionName=WorkerService(RedditWorkerService()).init, trigger=SchedulerTriggerEnum.INTERVAL, minutes=30)

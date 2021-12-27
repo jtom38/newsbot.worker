@@ -2,7 +2,7 @@ from typing import List, Dict
 import re
 from bs4 import BeautifulSoup
 from json import loads
-from workerInfra.domain import LoggerInterface, SourcesInterface, DriverInterface, CacheInterface
+from workerInfra.domain import LoggerInterface, SourcesInterface, DriverInterface, CacheInterface, RssHelperInterface
 from workerInfra.domain.rssFeedInterface import RssFeedInterface
 from workerInfra.enum import SourcesEnum
 from workerInfra.base import SourcesBase
@@ -10,7 +10,7 @@ from workerInfra.models import Articles, Icons
 from workerService.logger import BasicLoggerService
 from workerService.db import ArticlesTable, IconsTable
 from workerService import RequestSiteContent, RequestArticleContent, RequestContent, CacheFactory, SqlCache
-from workerService.sources.rssHelperService import *
+from workerService.sources.rssHelperService import Engadget, HowToGeek, ArsTechnica
 
 
 class RssWorkerService(SourcesBase, SourcesInterface):
@@ -50,7 +50,7 @@ class RssWorkerService(SourcesBase, SourcesInterface):
             else:
                 self._logger.warning(f"Found a invalid url in the database. Name: {link.name} - Url: {link.url}.  It should be updated.  Skipping over it for now.")
                 continue
-            
+
             rsc = RequestSiteContent(url=link.url)
             rsc.getPageDetails()
 
@@ -107,7 +107,7 @@ class RssWorkerService(SourcesBase, SourcesInterface):
                         f"Unable to find a feed for '{link.name}'.  This source is getting disabled."
                     )
                     for linkDiff in self.__links__:
-                        #link: Sources = link
+                        # link: Sources = link
                         if link.name == linkDiff.name:
                             linkDiff.enabled = False
 
@@ -296,9 +296,10 @@ class RssParser(RssFeedInterface):
                 if itemAuthor != "":
                     return itemAuthor
             except Exception as e:
+                self._logger.warning(e)
                 pass
         if itemAuthor == '':
-                self._logger.warning(f"Was unable to find the author on the RSS feed against the known items. {e}")
+            self._logger.warning("Was unable to find the author on the RSS feed against the known items.")
         return itemAuthor
 
 

@@ -42,7 +42,6 @@ class SourceLinksTable(RestSql):
             return self.__fromApi__(d)
         except Exception:
             return self.__generateBlank__()
-            
 
     def __listFromApi__(self, raw: str) -> List[SourceLinks]:
         d: List[dict] = loads(raw)
