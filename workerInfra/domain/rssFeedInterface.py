@@ -19,26 +19,32 @@ class RssFeedInterface(ABC):
 
     @abstractclassmethod
     def processItem(self, soup: BeautifulSoup) -> Articles:
+        """Process a single entry from the feed."""
         ...
 
     @abstractclassmethod
     def getTitle(self) -> str:
+        """Gets the title from the stored soup object against known values."""
         ...
 
     @abstractclassmethod
     def getAuthorName(self) -> str:
+        """Gets the author name from the stored soup object against known values."""
         ...
 
     @abstractclassmethod
     def getPublishDate(self) -> str:
+        """Gets the publish date from the stored soup object against known values."""
         ...
 
     @abstractclassmethod
     def getDescription(self) -> str:
+        """Gets the description/content from the stored soup object against known values."""
         ...
 
     @abstractclassmethod
     def getThumbnail(self) -> str:
+        """Gets the thumbnail from the stored soup object against known values."""
         ...
 
     @abstractclassmethod
@@ -50,8 +56,3 @@ class RssFeedInterface(ABC):
     def getLink(self) -> str:
         """Searches the _soup object to find the link object."""
         ...
-
-    # @abstractclassmethod
-    # def checkSiteIcon(self) -> None:
-    #     raise NotImplementedError()
-
