@@ -14,23 +14,33 @@ class RequestContent:
     RequestContent(url='www').
     RequestContent().setUrl("www").
     """
+    __url__: str
+    __soup__: BeautifulSoup
     _logger: LoggerInterface
 
     def __init__(self, url: str = "") -> None:
-        self.url = url
+        self.__url__ = url
         self._logger = BasicLoggerService()
+        self.__soup__ = None
+
+    def getUrl(self) -> str:
+        if self.__url__ != '':
+            return self.__url__
+        else:
+            raise ValueError("URL is missing from object.")
 
     def setUrl(self, url: str) -> None:
         """
         If you want to parse a URL, set the value here.
         """
-        self.url = url
+        # self.url = url
+        self.__url__ = url
 
     def setSoup(self, soup: BeautifulSoup) -> None:
         """
         If the source has already been parsed elsewhere, pass the BeautifulSoup object here.
         """
-        self.soup = soup
+        self.__soup__ = soup
 
     def __getHeaders__(self) -> dict:
         # return {"User-Agent": "NewsBot - Automated News Delivery"}
@@ -38,18 +48,18 @@ class RequestContent:
 
     def __getSource__(self) -> str:
         try:
-            res: Response = get(self.url, headers=self.__getHeaders__())
+            res: Response = get(self.getUrl(), headers=self.__getHeaders__())
             if res.ok is True:
                 self.__response__: Response = res
                 return res.text
             else:
                 self._logger.error(
-                    f"Attempted to get data from '{self.url}' but did not get any data.  StatusCode={res.status_code}"
+                    f"Attempted to get data from '{self.getUrl()}' but did not get any data.  StatusCode={res.status_code}"
                 )
                 return ""
         except Exception as e:
             self._logger.critical(
-                f"Failed to get data from '{self.url}' but resulted in an error. {e} "
+                f"Failed to get data from '{self.getUrl()}' but resulted in an error. {e} "
             )
 
     def __getSoup__(self) -> BeautifulSoup:
@@ -64,7 +74,7 @@ class RequestContent:
         """
         This pulls the source code and converts it into a BeautifulSoup object.
         """
-        if self.url == "":
+        if self.getUrl() == "":
             self._logger.error(
                 "Was requested to pull data from a site, but no URL was passed."
             )
@@ -72,7 +82,7 @@ class RequestContent:
             self.__source__ = self.__getSource__()
 
         try:
-            if self.__soup__.text == "":
+            if self.__soup__ == None:
                 self.__soup__ = self.__getSoup__()
             else:
                 pass
@@ -82,9 +92,7 @@ class RequestContent:
 
         pass
 
-    def findSingle(
-        self, name: str = "", attrKey: str = "", attrValue: str = ""
-    ) -> BeautifulSoup:
+    def findSingle(self, name: str = "", attrKey: str = "", attrValue: str = "" ) -> BeautifulSoup:
         if attrKey != "":
             attrs = {attrKey: attrValue}
             res = self.__soup__.find(name=name, attrs=attrs)
@@ -92,9 +100,7 @@ class RequestContent:
         else:
             return self.__soup__.find(name=name)
 
-    def findMany(
-        self, name: str = "", attrKey: str = "", attrValue: str = ""
-    ) -> List[BeautifulSoup]:
+    def findMany(self, name: str = "", attrKey: str = "", attrValue: str = "") -> List[BeautifulSoup]:
         if attrKey != "":
             return self.__soup__.find_all(name=name, attrs={attrKey: attrValue})
         else:
@@ -221,10 +227,16 @@ class RequestSiteContent(RequestContent):
     def __cleanUrl__(self, href: str, siteUrl: str) -> str:
         if href.startswith("//") is True:
             href = href.replace("//", "")
+            
         if "http://" in href or "https://" in href:
             return href
+
+        if "http://" not in href or "https://" not in href:
+            return f"{siteUrl}{href}"
+
         elif "http://" in siteUrl:
             return f"http://{href}"
+
         elif "https://" in siteUrl:
             return f"https://{href}"
 
