@@ -64,22 +64,22 @@ class RssWorkerService(SourcesBase, SourcesInterface):
             # hasHelper: bool = self.enableHelper(link.url)
 
             # Determin what typ of feed is on the site
-            #if 'github' in link.url:
+            # if 'github' in link.url:
             #    self._parser = GitHubParser(_logger = self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
 
             feed = rsc.findFeedLink(siteUrl=link.url)
             if feed["type"] == "atom":
-                self._parser = SoupParser(_logger = self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
+                self._parser = SoupParser(_logger=self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
 
             elif feed["type"] == "rss" or feed['type'] == "feedburner":
-                self._parser = SoupParser(_logger = self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
+                self._parser = SoupParser(_logger=self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
 
             elif feed["type"] == "json":
-                self._parser = JsonParser(_logger = self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
+                self._parser = JsonParser(_logger=self._logger, url=feed["content"], siteName=link.name, sourceId=self.getActiveSourceID())
 
             else:
                 # Unable to find a feed in the page's source code.
-                self._parser = SoupParser(_logger = self._logger, url=link.url, siteName=link.name, sourceId=self.getActiveSourceID())
+                self._parser = SoupParser(_logger=self._logger, url=link.url, siteName=link.name, sourceId=self.getActiveSourceID())
 
             items = self._parser.collectItems()
             for item in items:
@@ -106,7 +106,7 @@ class RssWorkerService(SourcesBase, SourcesInterface):
 
 
 class SoupParser(RssFeedInterface):
-    """This parser is made to handle soup based objects.  
+    """This parser is made to handle soup based objects.
     RSS, Feedburner and atom are all converted to soup objects and parsed."""
 
     _logger: LoggerInterface
@@ -139,7 +139,7 @@ class SoupParser(RssFeedInterface):
             if len(res) >= 1:
                 items.extend(res)
                 return items
-        #return self.content.findMany(name="entry")
+        # return self.content.findMany(name="entry")
 
     def processItem(self, item: BeautifulSoup) -> Articles:
         self._soup = item
@@ -167,14 +167,15 @@ class SoupParser(RssFeedInterface):
         res: str = ''
         try:
             title = self._soup.find(name='title').text
-            #summary = self.content.findSingle(name="summary")
-            #summarySplit = summary.contents[0].split('=')
+            # summary = self.content.findSingle(name="summary")
+            # summarySplit = summary.contents[0].split('=')
             res = title
         except Exception as e:
+            self._logger.warning(f"Failed to collect the title from the article. {e}")
             pass
 
         if title == '':
-            self._logger.warning("")
+            self._logger.warning("No title was found.")
 
         return res
 
@@ -187,7 +188,7 @@ class SoupParser(RssFeedInterface):
             try:
                 r = self._soup.find(name=item).text
                 res = r
-            except Exception as e:
+            except Exception:
                 pass
 
         if res == '':
@@ -205,7 +206,7 @@ class SoupParser(RssFeedInterface):
                 r = self._soup.find_all(name=item)
                 for i in r:
                     res += f", {i.text}"
-            except Exception as e:
+            except Exception:
                 pass
 
         if res == '':
@@ -242,7 +243,7 @@ class SoupParser(RssFeedInterface):
             elif url.attrs['href'] != '':
                 res = url.attrs['href']
         except Exception as e:
-            self._logger.error(f"Unable to find the link to the article from {self._siteName}.  Please review the feed.")
+            self._logger.error(f"Unable to find the link to the article from {self._siteName}.  Please review the feed. {e}")
 
         res = res.replace("\n", "")
         res = res.replace("\t", "")
@@ -263,7 +264,7 @@ class GitHubParser(SoupParser):
                 if "github.com" in self.url:
                     return author.find(name="name").text
             except Exception as e:
-                pass
+                self._logger.warning(f"Unable to get the AuthorName from GitHub post. {e}")
 
         return author
 
@@ -310,14 +311,15 @@ class AtomParser(RssFeedInterface):
         res: str = ''
         try:
             title = self.content.findSingle(name="title").text
-            summary = self.content.findSingle(name="summary")
-            summarySplit = summary.contents[0].split('=')
+            # summary = self.content.findSingle(name="summary")
+            # summarySplit = summary.contents[0].split('=')
             res = title
         except Exception as e:
+            self._logger.warning(f"Had issues finding the Title. {e}")
             pass
 
         if title == '':
-            self._logger.warning("")
+            self._logger.warning("No title was collected!  This article will be skipped.")
 
         return res
 
@@ -332,7 +334,7 @@ class AtomParser(RssFeedInterface):
                 author = self._soup.find(name=lookup).text
                 if "github.com" in self.url:
                     return author.find(name="name").text
-            except Exception as e:
+            except Exception:
                 pass
 
         return author
@@ -347,7 +349,7 @@ class AtomParser(RssFeedInterface):
             try:
                 r = self._soup.find(name=lookup).text
                 res = r
-            except Exception as e:
+            except Exception:
                 pass
 
         if res == '':
@@ -364,6 +366,7 @@ class AtomParser(RssFeedInterface):
             if ">" in text and "<" in text:
                 res = re.findall(">(.*?)<", text)[0]
         except Exception as e:
+            self._logger.warning(f"Failed to collect the Description on the article.  {e}")
             pass
 
         return res
@@ -397,7 +400,7 @@ class AtomParser(RssFeedInterface):
             elif url.attrs['href'] != '':
                 res = url.attrs['href']
         except Exception as e:
-            self._logger.error(f"Unable to find the link to the article from {self._siteName}.  Please review the feed.")
+            self._logger.error(f"Unable to find the link to the article from {self._siteName}.  Please review the feed. {e}")
 
         res = res.replace("\n", "")
         res = res.replace("\t", "")
@@ -498,7 +501,7 @@ class RssParser(SoupParser):
     #             except Exception as e:
     #                 self._logger.warning(f"Unable to find the description of the post with the known items. {e}")
     #                 pass
- # 
+#
     #         if i == "":
     #             self._logger.critical(
     #                 f"Failed to locate RSS body.  Review {self.url} for the reason"
@@ -534,7 +537,7 @@ class JsonParser(RssFeedInterface):
     _logger: LoggerInterface
     _soup: Dict
 
-    def __init__(self,  _logger: LoggerInterface, url: str, siteName: str, sourceId: str):
+    def __init__(self, _logger: LoggerInterface, url: str, siteName: str, sourceId: str):
         self._logger = _logger
         self._url: str = url
         self._siteName: str = siteName
