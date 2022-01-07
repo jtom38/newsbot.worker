@@ -82,7 +82,7 @@ class RequestContent:
             self.__source__ = self.__getSource__()
 
         try:
-            if self.__soup__ == None:
+            if self.__soup__ is None:
                 self.__soup__ = self.__getSoup__()
             else:
                 pass
@@ -92,7 +92,7 @@ class RequestContent:
 
         pass
 
-    def findSingle(self, name: str = "", attrKey: str = "", attrValue: str = "" ) -> BeautifulSoup:
+    def findSingle(self, name: str = "", attrKey: str = "", attrValue: str = "") -> BeautifulSoup:
         if attrKey != "":
             attrs = {attrKey: attrValue}
             res = self.__soup__.find(name=name, attrs=attrs)
@@ -227,7 +227,7 @@ class RequestSiteContent(RequestContent):
     def __cleanUrl__(self, href: str, siteUrl: str) -> str:
         if href.startswith("//") is True:
             href = href.replace("//", "")
-            
+
         if "http://" in href or "https://" in href:
             return href
 
