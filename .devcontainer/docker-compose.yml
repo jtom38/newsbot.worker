@@ -20,9 +20,10 @@ services:
       
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
+    network_mode: service:db
 
-    networks: 
-      - newsbotDev
+    # networks: 
+    #  - newsbotDev
 
   db:
     image: postgres:latest
