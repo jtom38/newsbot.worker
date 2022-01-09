@@ -30,19 +30,19 @@ target_metadata = None
 
 load_dotenv()
 
-DB_USER = environ.get("INVMON_DATABASE_USERNAME")
+DB_USER = environ.get("NEWSBOT_DATABASE_USERNAME")
 if DB_USER == None:
-    raise Exception("Did not find a value from env 'INVMON_DATABASE_USERNAME'.")
-DB_PASS = environ.get("INVMON_DATABASE_PASSWORD")
+    raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_USERNAME'.")
+DB_PASS = environ.get("NEWSBOT_DATABASE_PASSWORD")
 if DB_PASS == None:
-    raise Exception("Did not find a value from env 'INVMON_DATABASE_PASSWORD'.")
-DB_HOST = environ.get("INVMON_DATABASE_HOST")
+    raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_PASSWORD'.")
+DB_HOST = environ.get("NEWSBOT_DATABASE_HOST")
 if DB_HOST == None:
-    raise Exception("Did not find a value from env 'INVMON_DATABASE_HOST'.")
+    raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_HOST'.")
 #DB_PORT = environ.get("FOM_DB_PORT")
-DB_NAME = environ.get("INVMON_DATABASE_NAME")
+DB_NAME = environ.get("NEWSBOT_DATABASE_NAME")
 if DB_NAME == None:
-    raise Exception("Did not find a value from env 'INVMON_DATABASE_NAME'.")
+    raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_NAME'.")
 
 
 def run_migrations_offline():
