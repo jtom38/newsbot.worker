@@ -31,17 +31,19 @@ target_metadata = None
 load_dotenv()
 
 DB_USER = environ.get("NEWSBOT_DATABASE_USERNAME")
-if DB_USER == None:
+if DB_USER is None:
     raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_USERNAME'.")
+
 DB_PASS = environ.get("NEWSBOT_DATABASE_PASSWORD")
-if DB_PASS == None:
+if DB_PASS is None:
     raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_PASSWORD'.")
+
 DB_HOST = environ.get("NEWSBOT_DATABASE_HOST")
-if DB_HOST == None:
+if DB_HOST is None:
     raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_HOST'.")
-#DB_PORT = environ.get("FOM_DB_PORT")
+
 DB_NAME = environ.get("NEWSBOT_DATABASE_NAME")
-if DB_NAME == None:
+if DB_NAME is None:
     raise Exception("Did not find a value from env 'NEWSBOT_DATABASE_NAME'.")
 
 
@@ -57,7 +59,7 @@ def run_migrations_offline():
     script output.
 
     """
-    #url = config.get_main_option("sqlalchemy.url")
+    # url = config.get_main_option("sqlalchemy.url")
     section = config.get_section(config.config_ini_section)
     url = section["sqlalchemy.url"]
     url = url.replace("USER", DB_USER)
@@ -65,8 +67,8 @@ def run_migrations_offline():
     url = url.replace("HOST", DB_HOST)
     url = url.replace("DBNAME", DB_NAME)
     print(url)
-    #url = section["sqlalchemy.url"].format(DB_USER, DB_PASS, DB_HOST, DB_NAME)
-    #print(f"alembic url: {url}")
+    # url = section["sqlalchemy.url"].format(DB_USER, DB_PASS, DB_HOST, DB_NAME)
+    # print(f"alembic url: {url}")
 
     context.configure(
         url=url,
@@ -92,10 +94,10 @@ def run_migrations_online():
     url = url.replace("PASS", DB_PASS)
     url = url.replace("HOST", DB_HOST)
     url = url.replace("DBNAME", DB_NAME)
-    
+
     section["sqlalchemy.url"] = url
     connectable = engine_from_config(
-        #config.get_section(config.config_ini_section),
+        # config.get_section(config.config_ini_section),
         section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
